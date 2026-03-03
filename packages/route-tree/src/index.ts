@@ -1,0 +1,309 @@
+import {
+  scanFiles,
+  readFileContent,
+  colorize,
+} from '@ngtk/shared';
+import type { GlobalOptions, RouteNode } from '@ngtk/shared';
+
+function parseRouteObjects(content: string): RouteNode[] {
+  // Remove single-line comments
+  let cleaned = content.replace(/\/\/.*$/gm, '');
+  // Remove multi-line comments
+  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+
+  const routes: RouteNode[] = [];
+
+  // Find route arrays: Routes = [...] or routes: Routes = [...] or provideRouter([...])
+  // We'll look for array blocks that contain route-like objects
+  const routeArrayRegex = /(?:Routes\s*=\s*\[|routes\s*[:=]\s*(?:Routes\s*=\s*)?\[|provideRouter\s*\(\s*\[)([\s\S]*?)(?:\]\s*[;,)])/g;
+  let arrayMatch: RegExpExecArray | null;
+
+  while ((arrayMatch = routeArrayRegex.exec(cleaned)) !== null) {
+    const arrayContent = arrayMatch[1];
+    const parsed = parseRouteArray(arrayContent);
+    routes.push(...parsed);
+  }
+
+  return routes;
+}
+
+function parseRouteArray(content: string): RouteNode[] {
+  const routes: RouteNode[] = [];
+  const routeBlocks = extractObjectBlocks(content);
+
+  for (const block of routeBlocks) {
+    const route = parseRouteBlock(block);
+    if (route) {
+      routes.push(route);
+    }
+  }
+
+  return routes;
+}
+
+function extractObjectBlocks(content: string): string[] {
+  const blocks: string[] = [];
+  let depth = 0;
+  let start = -1;
+
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === '{') {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (content[i] === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        blocks.push(content.substring(start, i + 1));
+        start = -1;
+      }
+    }
+  }
+
+  return blocks;
+}
+
+function parseRouteBlock(block: string): RouteNode | null {
+  // Extract path
+  const pathMatch = block.match(/path\s*:\s*['"]([^'"]*)['"]/);
+  if (!pathMatch) return null;
+
+  const routePath = pathMatch[1];
+
+  // Extract component
+  let component: string | undefined;
+  const componentMatch = block.match(/component\s*:\s*([A-Za-z_][\w]*)/);
+  if (componentMatch) {
+    component = componentMatch[1];
+  }
+
+  // Check for lazy loading
+  let lazy = false;
+  const loadComponentMatch = block.match(/loadComponent\s*:/);
+  const loadChildrenMatch = block.match(/loadChildren\s*:/);
+  if (loadComponentMatch || loadChildrenMatch) {
+    lazy = true;
+  }
+
+  // Extract component name from loadComponent if not already found
+  if (!component && loadComponentMatch) {
+    // Match patterns like: loadComponent: () => import('...').then(m => m.ComponentName)
+    const lazyComponentMatch = block.match(
+      /loadComponent\s*:.*?\.then\s*\(\s*\w+\s*=>\s*\w+\.(\w+)\s*\)/,
+    );
+    if (lazyComponentMatch) {
+      component = lazyComponentMatch[1];
+    }
+  }
+
+  // Extract guards from canActivate
+  const guards: string[] = [];
+  const canActivateMatch = block.match(/canActivate\s*:\s*\[([^\]]*)\]/);
+  if (canActivateMatch) {
+    const guardsContent = canActivateMatch[1];
+    const guardRegex = /([A-Za-z_][\w]*)/g;
+    let guardMatch: RegExpExecArray | null;
+    while ((guardMatch = guardRegex.exec(guardsContent)) !== null) {
+      guards.push(guardMatch[1]);
+    }
+  }
+
+  // Also check canActivateChild
+  const canActivateChildMatch = block.match(/canActivateChild\s*:\s*\[([^\]]*)\]/);
+  if (canActivateChildMatch) {
+    const guardsContent = canActivateChildMatch[1];
+    const guardRegex = /([A-Za-z_][\w]*)/g;
+    let guardMatch: RegExpExecArray | null;
+    while ((guardMatch = guardRegex.exec(guardsContent)) !== null) {
+      if (!guards.includes(guardMatch[1])) {
+        guards.push(guardMatch[1]);
+      }
+    }
+  }
+
+  // Extract children recursively
+  const children: RouteNode[] = [];
+  const childrenMatch = block.match(/children\s*:\s*\[/);
+  if (childrenMatch) {
+    const startIdx = block.indexOf('[', childrenMatch.index! + childrenMatch[0].length - 1);
+    if (startIdx >= 0) {
+      const childContent = extractMatchingBracket(block, startIdx);
+      if (childContent) {
+        const childRoutes = parseRouteArray(childContent);
+        children.push(...childRoutes);
+      }
+    }
+  }
+
+  return {
+    path: routePath,
+    component,
+    lazy,
+    guards,
+    children,
+  };
+}
+
+function extractMatchingBracket(content: string, openIndex: number): string | null {
+  let depth = 0;
+  for (let i = openIndex; i < content.length; i++) {
+    if (content[i] === '[') depth++;
+    else if (content[i] === ']') {
+      depth--;
+      if (depth === 0) {
+        return content.substring(openIndex + 1, i);
+      }
+    }
+  }
+  return null;
+}
+
+function renderTree(routes: RouteNode[], prefix: string = '', isRoot: boolean = true): string[] {
+  const lines: string[] = [];
+
+  if (isRoot && routes.length > 0) {
+    // Find or synthesize the root route
+    const rootRoute = routes.find((r) => r.path === '' || r.path === '/');
+    if (rootRoute) {
+      lines.push(formatRouteNode('/', rootRoute));
+      // Render root's children, plus other top-level routes
+      const otherRoutes = routes.filter((r) => r !== rootRoute);
+      const allChildren = [...rootRoute.children, ...otherRoutes];
+      for (let i = 0; i < allChildren.length; i++) {
+        const isLast = i === allChildren.length - 1;
+        const connector = isLast ? '\u2514\u2500\u2500 ' : '\u251C\u2500\u2500 ';
+        const childPrefix = isLast ? '    ' : '\u2502   ';
+
+        lines.push(prefix + connector + formatRouteNode(allChildren[i].path, allChildren[i]));
+        const childLines = renderTree(allChildren[i].children, prefix + childPrefix, false);
+        lines.push(...childLines);
+      }
+    } else {
+      // No root route, render all at top level
+      for (let i = 0; i < routes.length; i++) {
+        const isLast = i === routes.length - 1;
+        const connector = isLast ? '\u2514\u2500\u2500 ' : '\u251C\u2500\u2500 ';
+        const childPrefix = isLast ? '    ' : '\u2502   ';
+
+        lines.push(prefix + connector + formatRouteNode(routes[i].path, routes[i]));
+        const childLines = renderTree(routes[i].children, prefix + childPrefix, false);
+        lines.push(...childLines);
+      }
+    }
+  } else {
+    for (let i = 0; i < routes.length; i++) {
+      const isLast = i === routes.length - 1;
+      const connector = isLast ? '\u2514\u2500\u2500 ' : '\u251C\u2500\u2500 ';
+      const childPrefix = isLast ? '    ' : '\u2502   ';
+
+      lines.push(prefix + connector + formatRouteNode(routes[i].path, routes[i]));
+      const childLines = renderTree(routes[i].children, prefix + childPrefix, false);
+      lines.push(...childLines);
+    }
+  }
+
+  return lines;
+}
+
+function formatRouteNode(displayPath: string, node: RouteNode): string {
+  let line = colorize(displayPath || '(empty)', 'white');
+
+  if (node.component) {
+    line += ` (${colorize(node.component, 'cyan')})`;
+  }
+
+  if (node.lazy) {
+    line += ` ${colorize('[lazy]', 'yellow')}`;
+  }
+
+  for (const guard of node.guards) {
+    line += ` ${colorize(`[guard: ${guard}]`, 'yellow')}`;
+  }
+
+  return line;
+}
+
+function mergeRoutes(allRoutes: RouteNode[][]): RouteNode[] {
+  // Flatten all parsed route arrays into a single tree
+  const merged: RouteNode[] = [];
+  for (const routes of allRoutes) {
+    merged.push(...routes);
+  }
+  return merged;
+}
+
+export async function run(options: GlobalOptions): Promise<void> {
+  const routingFiles = await scanFiles(options.root, [
+    '**/*routing*.ts',
+    '**/*routes*.ts',
+  ]);
+
+  if (routingFiles.length === 0) {
+    console.log(colorize('No routing files found.', 'yellow'));
+    return;
+  }
+
+  const allRoutes: RouteNode[][] = [];
+
+  for (const file of routingFiles) {
+    const content = await readFileContent(file);
+    const routes = parseRouteObjects(content);
+    if (routes.length > 0) {
+      if (options.verbose) {
+        console.log(colorize(`Parsed ${routes.length} route(s) from ${file}`, 'gray'));
+      }
+      allRoutes.push(routes);
+    }
+  }
+
+  const merged = mergeRoutes(allRoutes);
+
+  if (merged.length === 0) {
+    console.log(colorize('No route definitions found in routing files.', 'yellow'));
+    return;
+  }
+
+  if (options.json) {
+    console.log(JSON.stringify(merged, null, 2));
+    return;
+  }
+
+  const lines = renderTree(merged);
+  for (const line of lines) {
+    console.log(line);
+  }
+
+  // Print summary
+  console.log();
+  const totalRoutes = countRoutes(merged);
+  const lazyRoutes = countLazyRoutes(merged);
+  const guardedRoutes = countGuardedRoutes(merged);
+  console.log(
+    `${colorize(String(totalRoutes), 'cyan')} route(s), ` +
+    `${colorize(String(lazyRoutes), 'yellow')} lazy-loaded, ` +
+    `${colorize(String(guardedRoutes), 'green')} guarded`,
+  );
+}
+
+function countRoutes(routes: RouteNode[]): number {
+  let count = routes.length;
+  for (const route of routes) {
+    count += countRoutes(route.children);
+  }
+  return count;
+}
+
+function countLazyRoutes(routes: RouteNode[]): number {
+  let count = routes.filter((r) => r.lazy).length;
+  for (const route of routes) {
+    count += countLazyRoutes(route.children);
+  }
+  return count;
+}
+
+function countGuardedRoutes(routes: RouteNode[]): number {
+  let count = routes.filter((r) => r.guards.length > 0).length;
+  for (const route of routes) {
+    count += countGuardedRoutes(route.children);
+  }
+  return count;
+}

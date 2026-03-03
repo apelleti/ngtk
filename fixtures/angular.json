@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "projects": {
+    "demo-app": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application"
+    }
+  },
+  "defaultProject": "demo-app"
+}

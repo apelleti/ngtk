@@ -1,0 +1,27 @@
+{
+  "name": "@ngtk/cli",
+  "version": "0.1.0",
+  "bin": {
+    "ngtk": "./bin/ngtk.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "@ngtk/shared": "workspace:*",
+    "@ngtk/info": "workspace:*",
+    "@ngtk/env-compare": "workspace:*",
+    "@ngtk/component-weight": "workspace:*",
+    "@ngtk/dep-map": "workspace:*",
+    "@ngtk/orphans": "workspace:*",
+    "@ngtk/empty-barrel": "workspace:*",
+    "@ngtk/dead-css": "workspace:*",
+    "@ngtk/route-tree": "workspace:*",
+    "@ngtk/component-catalog": "workspace:*",
+    "@ngtk/compat-matrix": "workspace:*",
+    "@ngtk/debt-log": "workspace:*"
+  }
+}

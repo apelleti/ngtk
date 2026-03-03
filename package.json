@@ -1,0 +1,17 @@
+{
+  "name": "ngtk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Angular Toolkit CLI — diagnostiquer, analyser et maintenir les projets Angular",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "pnpm -r exec rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

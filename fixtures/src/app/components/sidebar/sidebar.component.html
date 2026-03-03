@@ -1,0 +1,6 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <button class="toggle-btn" (click)="toggle()">☰</button>
+  <ul class="menu-list">
+    <li *ngFor="let item of menuItems" class="menu-item">{{ item }}</li>
+  </ul>
+</aside>
