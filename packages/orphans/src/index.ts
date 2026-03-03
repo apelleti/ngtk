@@ -124,8 +124,12 @@ export async function run(options: GlobalOptions): Promise<void> {
     '**/*.scss',
   ]);
 
+  if (options.verbose) console.error(`Scanning ${allFiles.length} files for orphan detection...`);
+
   // Filter out excluded files
   const candidateFiles = allFiles.filter((f) => !isExcluded(f));
+
+  if (options.verbose) console.error(`Analyzing ${candidateFiles.length} candidate files...`);
 
   // Read all .ts files to build reference set
   const tsFiles = allFiles.filter((f) => f.endsWith('.ts'));

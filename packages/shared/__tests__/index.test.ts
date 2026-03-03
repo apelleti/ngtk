@@ -17,6 +17,7 @@ import {
   getComponents,
   getServices,
   colorize,
+  readVersionFromDeps,
 } from '../src/index';
 
 const FIXTURES = path.resolve(__dirname, '../../../fixtures');
@@ -135,5 +136,20 @@ describe('@ngtk/shared', () => {
   it('scanFiles returns empty for nonexistent patterns', async () => {
     const files = await scanFiles(FIXTURES, ['**/*.xyz']);
     expect(files).toEqual([]);
+  });
+
+  it('readVersionFromDeps reads from dependencies', () => {
+    const pkg = { dependencies: { '@angular/core': '^17.0.0' } };
+    expect(readVersionFromDeps(pkg, '@angular/core')).toBe('^17.0.0');
+  });
+
+  it('readVersionFromDeps reads from devDependencies', () => {
+    const pkg = { devDependencies: { typescript: '~5.4.0' } };
+    expect(readVersionFromDeps(pkg, 'typescript')).toBe('~5.4.0');
+  });
+
+  it('readVersionFromDeps returns "not found" for missing dep', () => {
+    const pkg = { dependencies: {} };
+    expect(readVersionFromDeps(pkg, 'nonexistent')).toBe('not found');
   });
 });

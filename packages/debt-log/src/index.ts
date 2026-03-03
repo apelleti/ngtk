@@ -130,6 +130,7 @@ export async function run(options: GlobalOptions): Promise<void> {
     '!**/node_modules/**',
     '!**/dist/**',
   ]);
+  if (options.verbose) console.error(`Scanning ${tsFiles.length} TypeScript files for debt comments...`);
 
   // Phase 1: Find all debt entries per file
   const filesWithDebt: {

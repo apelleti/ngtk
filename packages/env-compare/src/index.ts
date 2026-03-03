@@ -139,6 +139,7 @@ function buildMissingSummary(
 
 export async function run(options: GlobalOptions): Promise<void> {
   const envFiles = await parseEnvFiles(options.root);
+  if (options.verbose) console.error(`Found ${envFiles.length} environment file(s).`);
 
   if (envFiles.length === 0) {
     console.log('No environment*.ts files found.');

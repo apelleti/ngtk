@@ -9,7 +9,9 @@ import {
 } from '@ngtk/shared';
 
 export async function run(options: GlobalOptions): Promise<void> {
+  if (options.verbose) console.error('Scanning component files...');
   const components = await getComponents(options.root);
+  if (options.verbose) console.error(`Found ${components.length} components.`);
 
   components.sort((a: ComponentMeta, b: ComponentMeta) =>
     a.name.localeCompare(b.name),

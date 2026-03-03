@@ -3,6 +3,7 @@ import {
   type GlobalOptions,
   type CompatEntry,
   readFileContent,
+  readVersionFromDeps,
   createTable,
   colorize,
 } from '@ngtk/shared';
@@ -76,17 +77,6 @@ function formatRange(range: VersionRange): string {
   return `${range.min[0]}.${range.min[1]} - ${range.max[0]}.${range.max[1]}`;
 }
 
-function readVersionFromDeps(
-  pkg: Record<string, any>,
-  dep: string,
-): string {
-  return (
-    pkg.dependencies?.[dep] ||
-    pkg.devDependencies?.[dep] ||
-    'not found'
-  );
-}
-
 export async function run(options: GlobalOptions): Promise<void> {
   const pkgPath = path.join(options.root, 'package.json');
   const pkgContent = await readFileContent(pkgPath);
@@ -101,6 +91,7 @@ export async function run(options: GlobalOptions): Promise<void> {
   };
 
   const angularMajor = getMajor(versions['@angular/core']);
+  if (options.verbose) console.error(`Detected Angular v${angularMajor}, checking compatibility...`);
   const rule = COMPAT_MATRIX[angularMajor];
 
   const entries: CompatEntry[] = [];

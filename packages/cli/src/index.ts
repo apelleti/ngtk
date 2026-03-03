@@ -1,13 +1,17 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { Command } from 'commander';
 import { findAngularRoot, colorize } from '@ngtk/shared';
 import type { GlobalOptions } from '@ngtk/shared';
+
+const pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
 
 const program = new Command();
 
 program
   .name('ngtk')
   .description('Angular Toolkit CLI — diagnostiquer, analyser et maintenir les projets Angular')
-  .version('0.1.0');
+  .version(pkgJson.version, '-V, --version');
 
 // Global options helper
 function globalOpts(cmd: Command): Command {

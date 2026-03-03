@@ -4,6 +4,7 @@ import {
   type ComponentMeta,
   scanFiles,
   readFileContent,
+  readVersionFromDeps,
   createProject,
   getComponents,
   getServices,
@@ -45,14 +46,6 @@ async function detectPackageManager(root: string): Promise<string> {
     if (files.length > 0) return manager;
   }
   return 'unknown';
-}
-
-function readVersionFromDeps(pkg: Record<string, any>, dep: string): string {
-  return (
-    pkg.dependencies?.[dep] ||
-    pkg.devDependencies?.[dep] ||
-    'not found'
-  );
 }
 
 async function countSignalUsage(root: string): Promise<{ filesWithSignals: number; totalTsFiles: number }> {
@@ -152,7 +145,9 @@ async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
 }
 
 export async function run(options: GlobalOptions): Promise<void> {
+  if (options.verbose) console.error('Gathering project info...');
   const data = await gatherInfoData(options);
+  if (options.verbose) console.error(`Found ${data.counts.components} components, ${data.counts.services} services.`);
 
   if (options.json) {
     console.log(JSON.stringify(data, null, 2));

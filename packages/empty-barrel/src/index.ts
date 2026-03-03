@@ -62,6 +62,7 @@ function colorForType(type: EmptyBarrel['type']): 'red' | 'green' | 'yellow' | '
 }
 
 export async function run(options: GlobalOptions): Promise<void> {
+  if (options.verbose) console.error('Scanning for empty/boilerplate files...');
   const results: EmptyBarrel[] = [];
 
   // 1. Empty SCSS files

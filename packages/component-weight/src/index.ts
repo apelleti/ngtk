@@ -66,7 +66,9 @@ async function analyzeComponents(root: string): Promise<ComponentWeight[]> {
 }
 
 export async function run(options: GlobalOptions): Promise<void> {
+  if (options.verbose) console.error('Analyzing component weights...');
   const weights = await analyzeComponents(options.root);
+  if (options.verbose) console.error(`Found ${weights.length} components.`);
 
   if (weights.length === 0) {
     console.log('No *.component.ts files found.');

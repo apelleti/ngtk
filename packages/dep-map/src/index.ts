@@ -54,10 +54,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   const pkgContent = await readFileContent(pkgPath);
   const pkg = JSON.parse(pkgContent);
 
+  if (options.verbose) console.error('Parsing package.json dependencies...');
   const allDeps: DependencyInfo[] = [
     ...parseDeps(pkg.dependencies, 'dependencies'),
     ...parseDeps(pkg.devDependencies, 'devDependencies'),
   ];
+  if (options.verbose) console.error(`Found ${allDeps.length} dependencies.`);
 
   // Sort by category (angular first, then ecosystem, then generic), then by name
   const categoryOrder: Record<string, number> = {

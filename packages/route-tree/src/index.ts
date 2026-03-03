@@ -224,6 +224,8 @@ export async function run(options: GlobalOptions): Promise<void> {
     '**/*routes*.ts',
   ]);
 
+  if (options.verbose) console.error(`Found ${routingFiles.length} routing file(s).`);
+
   if (routingFiles.length === 0) {
     console.log(colorize('No routing files found.', 'yellow'));
     return;
@@ -236,7 +238,7 @@ export async function run(options: GlobalOptions): Promise<void> {
     const routes = parseRouteObjects(content);
     if (routes.length > 0) {
       if (options.verbose) {
-        console.log(colorize(`Parsed ${routes.length} route(s) from ${file}`, 'gray'));
+        console.error(`Parsed ${routes.length} route(s) from ${file}`);
       }
       allRoutes.push(routes);
     }

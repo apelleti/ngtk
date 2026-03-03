@@ -120,6 +120,7 @@ function extractUsedClasses(htmlContent: string): string[] {
 
 export async function run(options: GlobalOptions): Promise<void> {
   const styleFiles = await scanFiles(options.root, ['**/*.component.scss', '**/*.component.css']);
+  if (options.verbose) console.error(`Scanning ${styleFiles.length} component style files...`);
   const results: DeadCssResult[] = [];
 
   for (const styleFile of styleFiles) {
