@@ -34,11 +34,15 @@ function removeNestedBlocks(content: string): string {
   return result;
 }
 
+const STRIP_SINGLE_QUOTES = /'(?:[^'\\]|\\.)*'/g;
+const STRIP_DOUBLE_QUOTES = /"(?:[^"\\]|\\.)*"/g;
+const STRIP_TEMPLATE_LITERALS = /`(?:[^`\\]|\\.)*`/g;
+
 function stripStringLiterals(content: string): string {
   return content
-    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
-    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-    .replace(/`(?:[^`\\]|\\.)*`/g, '``');
+    .replace(STRIP_SINGLE_QUOTES, "''")
+    .replace(STRIP_DOUBLE_QUOTES, '""')
+    .replace(STRIP_TEMPLATE_LITERALS, '``');
 }
 
 function extractObjectKeys(content: string): string[] {

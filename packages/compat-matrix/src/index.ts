@@ -19,6 +19,12 @@ interface CompatRule {
   node: VersionRange;
 }
 
+// Known buggy patch versions per Angular major
+const BUGGY_PATCHES: Record<number, string[]> = {
+  17: ['17.0.0', '17.0.1'],
+  18: ['18.0.0'],
+};
+
 const COMPAT_MATRIX: Record<number, CompatRule> = {
   15: {
     typescript: { min: [4, 8], max: [4, 9] },
@@ -197,6 +203,19 @@ export async function run(options: GlobalOptions): Promise<void> {
     rows,
   );
   console.log(table);
+
+  // Check for known buggy patch versions
+  const angularRaw = versions['@angular/core'].replace(/^[~^>=<\s]+/, '');
+  const buggyList = BUGGY_PATCHES[angularMajor];
+  if (buggyList && buggyList.includes(angularRaw)) {
+    console.log('');
+    console.log(
+      colorize(
+        `⚠ ${angularRaw} is a known buggy patch version. Consider upgrading to the latest patch.`,
+        'yellow',
+      ),
+    );
+  }
 
   const incompatible = entries.filter((e: CompatEntry) => !e.compatible);
   if (incompatible.length > 0) {

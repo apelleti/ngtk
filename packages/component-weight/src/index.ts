@@ -4,7 +4,6 @@ import {
   type ComponentWeight,
   scanFiles,
   getFileSize,
-  fileExists,
   createTable,
   colorize,
   formatBytes,
@@ -19,9 +18,11 @@ async function findAssociatedFile(
 
   for (const ext of extensions) {
     const candidate = path.join(dir, `${baseName}.component.${ext}`);
-    if (fileExists(candidate)) {
+    try {
       const size = await getFileSize(candidate);
       return { filePath: candidate, size };
+    } catch {
+      // file doesn't exist, try next extension
     }
   }
   return null;

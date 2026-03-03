@@ -12,6 +12,22 @@ import {
 
 const execFileAsync = promisify(execFile);
 
+async function pLimit<T>(tasks: (() => Promise<T>)[], concurrency: number): Promise<T[]> {
+  const results: T[] = new Array(tasks.length);
+  let idx = 0;
+
+  async function worker(): Promise<void> {
+    while (idx < tasks.length) {
+      const i = idx++;
+      results[i] = await tasks[i]();
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
+
 const SINGLE_LINE_RE = /\/\/\s*(TODO|FIXME|HACK)\b:?\s*(.*)/i;
 const BLOCK_COMMENT_RE = /\/\*\s*(TODO|FIXME|HACK)\b:?\s*(.*?)\*\//i;
 
@@ -170,9 +186,10 @@ export async function run(options: GlobalOptions): Promise<void> {
     }
   }
 
-  // Phase 2: Parallel git blame for all files with debt
-  const blameMaps = await Promise.all(
-    filesWithDebt.map(({ filePath }) => getBlameInfoForFile(filePath)),
+  // Phase 2: Parallel git blame for all files with debt (max 10 concurrent)
+  const blameMaps = await pLimit(
+    filesWithDebt.map(({ filePath }) => () => getBlameInfoForFile(filePath)),
+    10,
   );
 
   // Phase 3: Merge debt entries with blame info

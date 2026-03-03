@@ -42,7 +42,10 @@ export function boxDraw(title: string, lines: string[]): string {
 }
 
 function stripAnsi(s: string): string {
-  return s.replace(/\x1b\[[0-9;]*m/g, '');
+  return s.replace(
+    /[\u001B\u009B][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+    '',
+  );
 }
 
 type ChalkColor = 'red' | 'green' | 'yellow' | 'blue' | 'cyan' | 'magenta' | 'gray' | 'white';
@@ -63,6 +66,7 @@ export function colorize(text: string, color: ChalkColor): string {
 }
 
 export function formatBytes(bytes: number): string {
+  if (bytes < 0) return `0 B`;
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
