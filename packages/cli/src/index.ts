@@ -4,7 +4,13 @@ import { Command } from 'commander';
 import { findAngularRoot, colorize } from '@ngtk/shared';
 import type { GlobalOptions } from '@ngtk/shared';
 
-const pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+let pkgJson: { version: string };
+try {
+  pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+} catch {
+  console.error('Error: could not read CLI package.json');
+  process.exit(1);
+}
 
 const program = new Command();
 
@@ -21,13 +27,19 @@ function globalOpts(cmd: Command): Command {
     .option('-v, --verbose', 'Verbose output', false);
 }
 
-async function getOptions(opts: any): Promise<GlobalOptions> {
+interface RawOptions {
+  root: string;
+  json: boolean;
+  verbose: boolean;
+}
+
+async function getOptions(opts: RawOptions): Promise<GlobalOptions> {
   const root = await findAngularRoot(opts.root);
   return { root, json: opts.json || false, verbose: opts.verbose || false };
 }
 
-function wrapAction(fn: (opts: any) => Promise<void>): (opts: any) => Promise<void> {
-  return async (opts: any) => {
+function wrapAction(fn: (opts: RawOptions) => Promise<void>): (opts: RawOptions) => Promise<void> {
+  return async (opts: RawOptions) => {
     try {
       await fn(opts);
     } catch (err: unknown) {
