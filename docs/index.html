@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ngtk — Angular Toolkit CLI</title>
   <meta name="description" content="Diagnose, analyze, and maintain Angular projects from the terminal. Zero config, 11 commands.">
@@ -135,7 +138,7 @@
       width: 100%;
       max-width: 560px;
       text-align: left;
-      font-family: 'Menlo', 'Consolas', monospace;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
       font-size: 0.82rem;
       line-height: 1.7;
       white-space: pre;
@@ -255,7 +258,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      font-family: 'Menlo', 'Consolas', monospace;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
       font-size: 0.8rem;
       padding: 0.35rem 0.85rem;
       border-radius: 6px;
@@ -270,7 +273,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
-      font-family: 'Menlo', 'Consolas', monospace;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
       font-size: 0.82rem;
       line-height: 1.75;
       white-space: pre;
@@ -332,7 +335,7 @@
     }
 
     .install-label {
-      font-family: 'Menlo', 'Consolas', monospace;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
       font-size: 0.8rem;
       color: var(--text-muted);
       width: 44px;
@@ -340,7 +343,7 @@
     }
 
     .install-cmd {
-      font-family: 'Menlo', 'Consolas', monospace;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
       font-size: 0.88rem;
       color: var(--accent);
       flex: 1;
@@ -598,9 +601,9 @@
       { text: '│    ', cls: 'c-muted' }, { text: 'Modules:', cls: 'c-yellow' }, { text: '       12                            │\n', cls: 'c-muted' },
       { text: '│                                                 │\n', cls: 'c-muted' },
       { text: '│  ', cls: 'c-muted' }, { text: 'Health Indicators', cls: 'c-cyan' }, { text: '                              │\n', cls: 'c-muted' },
-      { text: '│    ', cls: 'c-muted' }, { text: 'Standalone:', cls: 'c-magenta' }, { text: '   ████████░░  81%              │\n', cls: 'c-muted' },
-      { text: '│    ', cls: 'c-muted' }, { text: 'Signals:', cls: 'c-magenta' }, { text: '      ██████░░░░  30%              │\n', cls: 'c-muted' },
-      { text: '│    ', cls: 'c-muted' }, { text: 'Lazy Routes:', cls: 'c-magenta' }, { text: '  █████████░  86%              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Standalone:', cls: 'c-magenta' }, { text: '   ', cls: 'c-muted' }, { text: '████████', cls: 'c-green' }, { text: '░░', cls: 'c-muted' }, { text: '  81%              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Signals:', cls: 'c-magenta' }, { text: '      ', cls: 'c-muted' }, { text: '██████', cls: 'c-green' }, { text: '░░░░', cls: 'c-muted' }, { text: '  30%              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Lazy Routes:', cls: 'c-magenta' }, { text: '  ', cls: 'c-muted' }, { text: '█████████', cls: 'c-green' }, { text: '░', cls: 'c-muted' }, { text: '  86%              │\n', cls: 'c-muted' },
       { text: '╰─────────────────────────────────────────────────╯\n', cls: 'c-muted' },
     ];
 
@@ -650,9 +653,9 @@
 │    </span><span class="c-yellow">Modules:</span><span class="c-muted">       12                            │
 │                                                 │
 │  </span><span class="c-cyan">Health Indicators</span><span class="c-muted">                              │
-│    </span><span class="c-magenta">Standalone:</span><span class="c-muted">   ████████░░  81%              │
-│    </span><span class="c-magenta">Signals:</span><span class="c-muted">      ██████░░░░  30%              │
-│    </span><span class="c-magenta">Lazy Routes:</span><span class="c-muted">  █████████░  86%              │
+│    </span><span class="c-magenta">Standalone:</span><span class="c-muted">   </span><span class="c-green">████████</span><span class="c-muted">░░  81%              │
+│    </span><span class="c-magenta">Signals:</span><span class="c-muted">      </span><span class="c-green">██████</span><span class="c-muted">░░░░  30%              │
+│    </span><span class="c-magenta">Lazy Routes:</span><span class="c-muted">  </span><span class="c-green">█████████</span><span class="c-muted">░  86%              │
 ╰─────────────────────────────────────────────────╯</span>`,
 
       'route-tree': `<span class="c-green">$ npx ngtk route-tree</span>
@@ -732,7 +735,7 @@ Found <span class="c-yellow">5</span> orphan file(s). Total recoverable size: <s
 5   <span class="c-white">HeaderComponent</span>          3.2 KB      1.4 KB    2.8 KB  <span class="c-cyan">7.4 KB</span>
     ...
     <span class="c-yellow">TOTAL</span>                    182.3 KB    96.4 KB   74.1 KB <span class="c-yellow">352.8 KB</span>
-    <span class="c-muted">AVG</span>                      <span class="c-muted">3.9 KB</span>      <span class="c-muted">2.1 KB</span>    <span class="c-muted">1.6 KB</span>  <span class="c-muted">7.5 KB</span>`,
+    <span class="c-muted">AVG</span>                      <span class="c-muted">3.9 KB      2.1 KB    1.6 KB  7.5 KB</span>`,
 
       'dep-map': `<span class="c-green">$ npx ngtk dep-map</span>
 
@@ -781,7 +784,7 @@ UserFormComponent         app-user-form             <span class="c-green">✓</s
 UserListComponent         app-user-list             <span class="c-red">✗</span>           src/users/user-list/user-list.component.ts
 
 47 components: <span class="c-green">38</span> standalone, <span class="c-yellow">9</span> module-based
-Standalone ratio: ████████░░ 81%`,
+Standalone ratio: <span class="c-green">████████</span><span class="c-muted">░░</span> 81%`,
 
       'compat-matrix': `<span class="c-green">$ npx ngtk compat-matrix</span>
 
