@@ -33,8 +33,17 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.35)
 
+  packages/circular-deps:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
   packages/cli:
     dependencies:
+      '@ngtk/circular-deps':
+        specifier: workspace:*
+        version: link:../circular-deps
       '@ngtk/compat-matrix':
         specifier: workspace:*
         version: link:../compat-matrix
@@ -59,9 +68,24 @@ importers:
       '@ngtk/env-compare':
         specifier: workspace:*
         version: link:../env-compare
+      '@ngtk/hardcoded-secrets':
+        specifier: workspace:*
+        version: link:../hardcoded-secrets
+      '@ngtk/i18n-check':
+        specifier: workspace:*
+        version: link:../i18n-check
       '@ngtk/info':
         specifier: workspace:*
         version: link:../info
+      '@ngtk/input-output':
+        specifier: workspace:*
+        version: link:../input-output
+      '@ngtk/migration-hints':
+        specifier: workspace:*
+        version: link:../migration-hints
+      '@ngtk/naming-check':
+        specifier: workspace:*
+        version: link:../naming-check
       '@ngtk/orphans':
         specifier: workspace:*
         version: link:../orphans
@@ -71,6 +95,15 @@ importers:
       '@ngtk/shared':
         specifier: workspace:*
         version: link:../shared
+      '@ngtk/signal-migrate':
+        specifier: workspace:*
+        version: link:../signal-migrate
+      '@ngtk/style-audit':
+        specifier: workspace:*
+        version: link:../style-audit
+      '@ngtk/test-coverage':
+        specifier: workspace:*
+        version: link:../test-coverage
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -123,7 +156,37 @@ importers:
         specifier: workspace:*
         version: link:../shared
 
+  packages/hardcoded-secrets:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/i18n-check:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
   packages/info:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/input-output:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/migration-hints:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/naming-check:
     dependencies:
       '@ngtk/shared':
         specifier: workspace:*
@@ -155,6 +218,24 @@ importers:
       ts-morph:
         specifier: ^22.0.0
         version: 22.0.0
+
+  packages/signal-migrate:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/style-audit:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/test-coverage:
+    dependencies:
+      '@ngtk/shared':
+        specifier: workspace:*
+        version: link:../shared
 
 packages:
 

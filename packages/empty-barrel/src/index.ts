@@ -43,6 +43,13 @@ function isEmptyTemplate(content: string): boolean {
   const placeholderRegex = /^<p>\s*\w[\w-]*\s+works!?\s*<\/p>$/i;
   if (placeholderRegex.test(trimmed)) return true;
 
+  // Check for templates containing only <router-outlet></router-outlet>
+  if (/^\s*<router-outlet\s*><\/router-outlet>\s*$/i.test(trimmed)) return true;
+
+  // Check for templates containing only HTML comments
+  const withoutComments = trimmed.replace(/<!--[\s\S]*?-->/g, '').trim();
+  if (withoutComments.length === 0) return true;
+
   return false;
 }
 

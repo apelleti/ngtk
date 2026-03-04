@@ -1,0 +1,13 @@
+<div class="product-grid">
+  <h2 class="section-title">Products</h2>
+  <div class="sort-controls">
+    <button class="sort-btn" (click)="sortProducts('name')">Sort by Name</button>
+    <button class="sort-btn" (click)="sortProducts('price')">Sort by Price</button>
+  </div>
+  <div class="product-card" *ngFor="let product of products">
+    <h3 class="product-name">{{ product.name }}</h3>
+    <p class="product-price">${{ product.price }}</p>
+    <span class="product-category">{{ product.category }}</span>
+    <a [routerLink]="['product', product.id]" class="view-link">View Details</a>
+  </div>
+</div>

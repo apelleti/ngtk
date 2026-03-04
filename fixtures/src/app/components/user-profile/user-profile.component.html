@@ -1,0 +1,9 @@
+<div class="profile-card">
+  <img class="avatar" [src]="user().avatar" [alt]="user().name" />
+  <h2 class="profile-name">{{ displayName() }}</h2>
+  <p class="profile-email">{{ user().email }}</p>
+  <p class="profile-date">Member since {{ user().joinDate }}</p>
+  <button class="edit-btn" (click)="toggleEdit()">
+    {{ isEditing() ? 'Cancel' : 'Edit Profile' }}
+  </button>
+</div>

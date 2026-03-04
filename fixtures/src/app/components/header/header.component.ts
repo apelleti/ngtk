@@ -1,24 +1,15 @@
-import { Component, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent {
-  title = signal('Demo App');
-  upperTitle = computed(() => this.title().toUpperCase());
+export class HeaderComponent implements OnInit {
+  title = signal('My App');
+  subtitle = computed(() => `Welcome to ${this.title()}`);
 
-  constructor() {
-    effect(() => {
-      document.title = this.title();
-    });
-  }
-
-  updateTitle(newTitle: string) {
-    this.title.set(newTitle);
-  }
+  ngOnInit() {}
 }

@@ -24,18 +24,20 @@ function globalOpts(cmd: Command): Command {
   return cmd
     .option('-r, --root <path>', 'Angular project root', process.cwd())
     .option('--json', 'Output as JSON', false)
-    .option('-v, --verbose', 'Verbose output', false);
+    .option('-v, --verbose', 'Verbose output', false)
+    .option('-m, --more', 'Show file details for each indicator', false);
 }
 
 interface RawOptions {
   root: string;
   json: boolean;
   verbose: boolean;
+  more: boolean;
 }
 
 async function getOptions(opts: RawOptions): Promise<GlobalOptions> {
   const root = await findAngularRoot(opts.root);
-  return { root, json: opts.json || false, verbose: opts.verbose || false };
+  return { root, json: opts.json || false, verbose: opts.verbose || false, more: opts.more || false };
 }
 
 function wrapAction(fn: (opts: RawOptions) => Promise<void>): (opts: RawOptions) => Promise<void> {
@@ -139,6 +141,78 @@ globalOpts(
   program.command('debt-log').alias('debt').description('Aggregate TODO/FIXME/HACK comments with git blame')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/debt-log');
+  await run(await getOptions(opts));
+}));
+
+// 12. input-output
+globalOpts(
+  program.command('input-output').alias('io').description('Audit @Input/@Output usage across components')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/input-output');
+  await run(await getOptions(opts));
+}));
+
+// 13. circular-deps
+globalOpts(
+  program.command('circular-deps').alias('cd').description('Detect circular import dependencies')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/circular-deps');
+  await run(await getOptions(opts));
+}));
+
+// 14. test-coverage
+globalOpts(
+  program.command('test-coverage').alias('tc').description('Show test coverage summary from reports')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/test-coverage');
+  await run(await getOptions(opts));
+}));
+
+// 15. i18n-check
+globalOpts(
+  program.command('i18n-check').alias('i18n').description('Find missing i18n markers in templates')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/i18n-check');
+  await run(await getOptions(opts));
+}));
+
+// 16. migration-hints
+globalOpts(
+  program.command('migration-hints').alias('mig').description('List Angular migration opportunities')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/migration-hints');
+  await run(await getOptions(opts));
+}));
+
+// 17. signal-migrate
+globalOpts(
+  program.command('signal-migrate').alias('sig').description('Find signal() migration candidates')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/signal-migrate');
+  await run(await getOptions(opts));
+}));
+
+// 18. naming-check
+globalOpts(
+  program.command('naming-check').alias('nc').description('Check Angular naming conventions')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/naming-check');
+  await run(await getOptions(opts));
+}));
+
+// 19. style-audit
+globalOpts(
+  program.command('style-audit').alias('sa').description('Audit stylesheets for ng-deep, !important, etc.')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/style-audit');
+  await run(await getOptions(opts));
+}));
+
+// 20. hardcoded-secrets
+globalOpts(
+  program.command('hardcoded-secrets').alias('secrets').description('Scan for hardcoded API keys, tokens, passwords')
+).action(wrapAction(async (opts) => {
+  const { run } = await import('@ngtk/hardcoded-secrets');
   await run(await getOptions(opts));
 }));
 

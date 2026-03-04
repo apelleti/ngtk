@@ -1,15 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AppComponent } from './app.component';
-import { FooterComponent, SidebarComponent } from './components';
-import { formatDate } from './utils';
-
-console.log(formatDate(new Date()));
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
-  declarations: [AppComponent, FooterComponent, SidebarComponent],
+  declarations: [AppComponent],
   imports: [BrowserModule, AppRoutingModule],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

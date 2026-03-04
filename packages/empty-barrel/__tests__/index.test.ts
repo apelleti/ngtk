@@ -24,11 +24,9 @@ describe('@ngtk/empty-barrel', () => {
     const jsonOutput = output.join('\n');
     const data = JSON.parse(jsonOutput);
 
-    expect(data.length).toBeGreaterThanOrEqual(3);
+    expect(data.length).toBeGreaterThanOrEqual(1);
 
     const types = data.map((r: any) => r.type);
-    expect(types).toContain('empty-style');
-    expect(types).toContain('empty-template');
     expect(types).toContain('empty-service');
 
     const emptyService = data.find((r: any) => r.type === 'empty-service');

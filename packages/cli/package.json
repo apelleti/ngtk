@@ -22,6 +22,18 @@
     "@ngtk/route-tree": "workspace:*",
     "@ngtk/component-catalog": "workspace:*",
     "@ngtk/compat-matrix": "workspace:*",
-    "@ngtk/debt-log": "workspace:*"
+    "@ngtk/debt-log": "workspace:*",
+    "@ngtk/input-output": "workspace:*",
+    "@ngtk/circular-deps": "workspace:*",
+    "@ngtk/test-coverage": "workspace:*",
+    "@ngtk/i18n-check": "workspace:*",
+    "@ngtk/migration-hints": "workspace:*",
+    "@ngtk/signal-migrate": "workspace:*",
+    "@ngtk/naming-check": "workspace:*",
+    "@ngtk/style-audit": "workspace:*",
+    "@ngtk/hardcoded-secrets": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

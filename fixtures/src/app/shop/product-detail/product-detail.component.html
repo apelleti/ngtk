@@ -1,0 +1,9 @@
+<div class="product-detail">
+  <h2 class="detail-title">Product #{{ productId() }}</h2>
+  <div class="quantity-selector">
+    <button class="qty-btn" (click)="updateQuantity(-1)">−</button>
+    <span class="qty-value">{{ quantity() }}</span>
+    <button class="qty-btn" (click)="updateQuantity(1)">+</button>
+  </div>
+  <button class="add-to-cart-btn" (click)="addToCart()">Add to Cart</button>
+</div>

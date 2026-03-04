@@ -42,7 +42,7 @@ export async function run(options: GlobalOptions): Promise<void> {
   console.log(table);
 
   console.log('');
-  const bar = progressBar(standaloneCount, components.length);
+  const bar = progressBar(standaloneCount, components.length, 20, 'green');
   console.log(
     `${components.length} components: ${colorize(String(standaloneCount), 'green')} standalone, ${colorize(String(moduleBasedCount), 'yellow')} module-based`,
   );

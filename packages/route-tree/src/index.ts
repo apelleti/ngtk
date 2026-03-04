@@ -222,10 +222,17 @@ function formatRouteNode(displayPath: string, node: RouteNode): string {
 }
 
 function mergeRoutes(allRoutes: RouteNode[][]): RouteNode[] {
-  // Flatten all parsed route arrays into a single tree
+  // Flatten all parsed route arrays into a single tree, deduplicating by path+component
   const merged: RouteNode[] = [];
+  const seen = new Set<string>();
   for (const routes of allRoutes) {
-    merged.push(...routes);
+    for (const route of routes) {
+      const key = `${route.path}::${route.component ?? ''}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push(route);
+      }
+    }
   }
   return merged;
 }

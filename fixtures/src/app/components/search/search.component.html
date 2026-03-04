@@ -1,0 +1,17 @@
+<div class="search-wrapper">
+  <input
+    class="search-input"
+    type="text"
+    placeholder="Search products..."
+    [value]="query()"
+    (input)="onInput($any($event.target).value)"
+  />
+  @if (query()) {
+    <button class="clear-btn" (click)="clearSearch()">Clear</button>
+  }
+  <ul class="search-results">
+    @for (result of results(); track result) {
+      <li class="result-item">{{ result }}</li>
+    }
+  </ul>
+</div>

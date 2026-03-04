@@ -161,16 +161,29 @@ export async function run(options: GlobalOptions): Promise<void> {
 
     const lines = content.split('\n');
     const debtEntries: { lineNumber: number; type: DebtItem['type']; message: string }[] = [];
+    const blockCommentLines = new Set<number>();
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const lineNumber = i + 1;
-
-      let match = SINGLE_LINE_RE.exec(line);
-      if (!match) {
-        match = BLOCK_COMMENT_RE.exec(line);
+    // First pass: extract multi-line block comments from full content
+    const blockRe = /\/\*\s*(TODO|FIXME|HACK)\b:?\s*([\s\S]*?)\*\//gi;
+    let blockMatch: RegExpExecArray | null;
+    while ((blockMatch = blockRe.exec(content)) !== null) {
+      const startLine = content.slice(0, blockMatch.index).split('\n').length;
+      const type = blockMatch[1].toUpperCase() as DebtItem['type'];
+      const message = blockMatch[2].replace(/\s*\n\s*/g, ' ').trim();
+      debtEntries.push({ lineNumber: startLine, type, message });
+      // Track lines covered by this block comment to avoid double-counting
+      const endLine = content.slice(0, blockMatch.index + blockMatch[0].length).split('\n').length;
+      for (let l = startLine; l <= endLine; l++) {
+        blockCommentLines.add(l);
       }
+    }
 
+    // Second pass: single-line comments
+    for (let i = 0; i < lines.length; i++) {
+      const lineNumber = i + 1;
+      if (blockCommentLines.has(lineNumber)) continue;
+
+      const match = SINGLE_LINE_RE.exec(lines[i]);
       if (match) {
         const type = match[1].toUpperCase() as DebtItem['type'];
         const message = match[2].trim();

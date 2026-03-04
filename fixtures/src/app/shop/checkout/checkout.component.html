@@ -1,0 +1,13 @@
+<div class="checkout-container">
+  <h2 class="checkout-title">Checkout — Step {{ step }}</h2>
+  <div class="step-indicator">
+    <span class="step" [class.active]="step >= 1">Shipping</span>
+    <span class="step" [class.active]="step >= 2">Payment</span>
+    <span class="step" [class.active]="step >= 3">Review</span>
+  </div>
+  <div class="checkout-actions">
+    <button class="prev-btn" *ngIf="step > 1" (click)="prevStep()">Back</button>
+    <button class="next-btn" *ngIf="step < 3" (click)="nextStep()">Next</button>
+    <button class="place-order-btn" *ngIf="step === 3" (click)="placeOrder()">Place Order</button>
+  </div>
+</div>

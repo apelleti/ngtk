@@ -24,8 +24,8 @@ describe('@ngtk/info', () => {
     const jsonOutput = output.join('\n');
     const data = JSON.parse(jsonOutput);
 
-    expect(data.versions.angular).toContain('17');
-    expect(data.versions.typescript).toContain('5.4');
+    expect(data.versions.angular).toContain('18');
+    expect(data.versions.typescript).toContain('5.5');
     expect(data.versions.node).toMatch(/^v?\d+/);
 
     // fixture has app, header, footer, sidebar, dashboard, users = 6 components

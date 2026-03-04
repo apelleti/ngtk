@@ -14,30 +14,41 @@ npx ngtk info
 ```
 
 ```
-╭─────────────────────────────────────────────────╮
-│  ngtk — Angular Project Info                    │
-│                                                 │
-│  Versions                                       │
-│    Angular:      ^18.2.0                        │
-│    TypeScript:   ~5.4.5                         │
-│    RxJS:         ~7.8.1                         │
-│    Node:         v20.11.0                       │
-│    Pkg Manager:  pnpm                           │
-│                                                 │
-│  Artifact Counts                                │
-│    Components:    47                            │
-│    Services:      22                            │
-│    Pipes:          5                            │
-│    Directives:     8                            │
-│    Guards:         3                            │
-│    Interceptors:   2                            │
-│    Modules:       12                            │
-│                                                 │
-│  Health Indicators                              │
-│    Standalone:   [========--]  38/47  (81%)     │
-│    Signals:      [======----]  14/47  (30%)     │
-│    Lazy Routes:  [=========.]  18/21  (86%)     │
-╰─────────────────────────────────────────────────╯
+╭────────────────────────────────────────────────────────────╮
+│                                                            │
+│   Project                                                  │
+│     Name:         demo-app                                 │
+│     Type:         application                              │
+│                                                            │
+│   Versions                                                 │
+│     Angular:      ^18.2.0                                  │
+│     TypeScript:   ~5.5.0                                   │
+│     RxJS:         ~7.8.1                                   │
+│     Node:         v22.12.0                                 │
+│     Pkg Manager:  pnpm                                     │
+│     Build Tool:   esbuild                                  │
+│                                                            │
+│   Configuration                                            │
+│     Strict Mode:  yes                                      │
+│     Zoneless:     no                                       │
+│     Material:     no                                       │
+│     NX:           no                                       │
+│                                                            │
+│   Artifact Counts                                          │
+│     Components:     16                                     │
+│     Services:        7                                     │
+│     Pipes:           1                                     │
+│     Directives:      1                                     │
+│     Guards:          2                                     │
+│     Interceptors:    1                                     │
+│     Modules:         6                                     │
+│                                                            │
+│   Health Indicators                                        │
+│     Standalone:   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ 56%  (9/16)         │
+│     Signals:      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ 22%  (10/45 files)  │
+│     Lazy Routes:  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ 63%  (10/16 routes) │
+│                                                            │
+╰────────────────────────────────────────────────────────────╯
 ```
 
 ## Why ngtk?

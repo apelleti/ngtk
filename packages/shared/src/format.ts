@@ -10,17 +10,25 @@ export function createTable(headers: string[], rows: string[][]): string {
   return table.toString();
 }
 
-export function progressBar(value: number, total: number, width: number = 20): string {
+export function progressBar(value: number, total: number, width: number = 20, color: 'green' | 'greenBright' | 'darkGreen' | 'cyan' | 'yellow' | 'magenta' | 'red' = 'green'): string {
   const ratio = total > 0 ? Math.min(value / total, 1) : 0;
   const filled = Math.round(ratio * width);
   const empty = width - filled;
   const percent = Math.round(ratio * 100);
-  const bar = chalk.green('\u2588'.repeat(filled)) + chalk.gray('\u2591'.repeat(empty));
+  let filledBar: string;
+  if (color === 'greenBright') {
+    filledBar = chalk.greenBright('\u2584'.repeat(filled));
+  } else if (color === 'darkGreen') {
+    filledBar = chalk.hex('#1a6b3a')('\u2584'.repeat(filled));
+  } else {
+    filledBar = chalk[color]('\u2584'.repeat(filled));
+  }
+  const bar = filledBar + chalk.hex('#3a3a3a')('\u2584'.repeat(empty));
   return `${bar} ${percent}%`;
 }
 
-export function boxDraw(title: string, lines: string[]): string {
-  const allContent = [title, ...lines];
+export function boxDraw(title: string | null, lines: string[]): string {
+  const allContent = title ? [title, ...lines] : lines;
   const maxLen = Math.max(...allContent.map((l) => stripAnsi(l).length));
   const width = maxLen + 2;
   const hr = '\u2500'.repeat(width);
@@ -31,9 +39,12 @@ export function boxDraw(title: string, lines: string[]): string {
   };
 
   const out: string[] = [];
+
   out.push(chalk.cyan(`\u256D${hr}\u256E`));
-  out.push(chalk.cyan('\u2502') + chalk.bold(pad(title)) + chalk.cyan('\u2502'));
-  out.push(chalk.cyan(`\u251C${hr}\u2524`));
+  if (title) {
+    out.push(chalk.cyan('\u2502') + chalk.bold(pad(title)) + chalk.cyan('\u2502'));
+    out.push(chalk.cyan(`\u251C${hr}\u2524`));
+  }
   for (const line of lines) {
     out.push(chalk.cyan('\u2502') + pad(line) + chalk.cyan('\u2502'));
   }

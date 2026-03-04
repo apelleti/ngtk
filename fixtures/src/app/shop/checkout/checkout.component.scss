@@ -1,0 +1,45 @@
+.checkout-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 32px;
+}
+
+.checkout-title {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.step-indicator {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.step {
+  color: #999;
+  font-weight: 500;
+  &.active { color: #0f3460; font-weight: bold; }
+}
+
+.checkout-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.prev-btn, .next-btn {
+  padding: 10px 24px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.place-order-btn {
+  padding: 10px 32px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

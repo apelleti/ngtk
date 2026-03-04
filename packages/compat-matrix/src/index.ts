@@ -23,6 +23,7 @@ interface CompatRule {
 const BUGGY_PATCHES: Record<number, string[]> = {
   17: ['17.0.0', '17.0.1'],
   18: ['18.0.0'],
+  21: ['21.0.0'],
 };
 
 const COMPAT_MATRIX: Record<number, CompatRule> = {
@@ -42,12 +43,22 @@ const COMPAT_MATRIX: Record<number, CompatRule> = {
     node: { min: [18, 13], max: [22, 99] },
   },
   18: {
-    typescript: { min: [5, 4], max: [5, 5] },
+    typescript: { min: [5, 4], max: [5, 6] },
     rxjs: { min: [7, 4], max: [7, 99] },
     node: { min: [18, 19], max: [22, 99] },
   },
   19: {
     typescript: { min: [5, 5], max: [5, 7] },
+    rxjs: { min: [7, 4], max: [7, 99] },
+    node: { min: [18, 19], max: [22, 99] },
+  },
+  20: {
+    typescript: { min: [5, 7], max: [5, 8] },
+    rxjs: { min: [7, 4], max: [7, 99] },
+    node: { min: [18, 19], max: [22, 99] },
+  },
+  21: {
+    typescript: { min: [5, 7], max: [5, 9] },
     rxjs: { min: [7, 4], max: [7, 99] },
     node: { min: [18, 19], max: [22, 99] },
   },

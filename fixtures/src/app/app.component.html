@@ -1,5 +1,7 @@
-<app-header></app-header>
+<app-navbar></app-navbar>
+<app-notification></app-notification>
 <main class="content main-wrapper">
   <router-outlet></router-outlet>
+  <app-widget [title]="'Dashboard'" [showBorder]="true" (closed)="onClose()"></app-widget>
 </main>
 <app-footer></app-footer>

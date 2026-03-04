@@ -147,13 +147,48 @@ export async function run(options: GlobalOptions): Promise<void> {
     try {
       htmlContent = await readFileContent(htmlFile);
     } catch {
-      continue; // No HTML template found
+      htmlContent = ''; // No HTML template found — still check inline template
     }
 
-    // Skip components with [class]="expr" binding — too dynamic to analyze
-    if (hasDynamicClassBinding(htmlContent)) continue;
+    // Find corresponding TypeScript file for inline templates and dynamic class usage
+    const tsFile = styleFile.replace(/\.(?:scss|css)$/, '.ts');
+    let tsContent = '';
+    try {
+      tsContent = await readFileContent(tsFile);
+    } catch { /* no TS file */ }
 
-    const used = extractUsedClasses(htmlContent);
+    // Extract inline template from TS file if present
+    let inlineTemplateContent = '';
+    if (tsContent) {
+      // Match template: '...' or template: `...`
+      const templateSingleMatch = tsContent.match(/template\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      const templateBacktickMatch = tsContent.match(/template\s*:\s*`([\s\S]*?)`/);
+      if (templateBacktickMatch) {
+        inlineTemplateContent = templateBacktickMatch[1];
+      } else if (templateSingleMatch) {
+        inlineTemplateContent = templateSingleMatch[1];
+      }
+    }
+
+    const combinedHtml = htmlContent + '\n' + inlineTemplateContent;
+
+    // Skip components with [class]="expr" binding — too dynamic to analyze
+    if (hasDynamicClassBinding(combinedHtml)) continue;
+
+    const used = extractUsedClasses(combinedHtml);
+
+    // Detect classes added dynamically via classList.add or renderer.addClass in TS
+    if (tsContent) {
+      const classListAddRe = /classList\.add\s*\(\s*['"]([a-zA-Z_][\w-]*)['"]\s*\)/g;
+      const rendererAddRe = /renderer\.addClass\s*\([^,]+,\s*['"]([a-zA-Z_][\w-]*)['"]\s*\)/g;
+      let dm: RegExpExecArray | null;
+      while ((dm = classListAddRe.exec(tsContent)) !== null) {
+        used.push(dm[1]);
+      }
+      while ((dm = rendererAddRe.exec(tsContent)) !== null) {
+        used.push(dm[1]);
+      }
+    }
 
     const usedSet = new Set(used);
     const unused = declared.filter((cls) => !usedSet.has(cls));

@@ -7,6 +7,7 @@
     "build": "pnpm -r run build",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "clean": "pnpm -r exec rm -rf dist",
     "lint": "eslint 'packages/*/src/**/*.ts'",
     "format": "prettier --write 'packages/*/src/**/*.ts' 'packages/*/__tests__/**/*.ts'"

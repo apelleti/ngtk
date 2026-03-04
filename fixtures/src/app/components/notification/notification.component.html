@@ -1,0 +1,8 @@
+<div class="notification-container">
+  @for (notif of notifications(); track notif.id) {
+    <div class="notification" [class]="'notification-' + notif.type">
+      <span class="notification-message">{{ notif.message }}</span>
+      <button class="dismiss-btn" (click)="dismiss(notif.id)">×</button>
+    </div>
+  }
+</div>
