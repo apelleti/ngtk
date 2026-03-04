@@ -12,6 +12,7 @@ import {
   boxDraw,
   colorize,
   progressBar,
+  loadConfig,
 } from '@ngpulse/shared';
 
 interface InfoData {
@@ -241,7 +242,11 @@ async function countLazyRoutes(root: string): Promise<{ lazy: number; totalRoute
 }
 
 async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
-  const pkgContent = await readFileContent(path.join(options.root, 'package.json'));
+  const pkgPath = path.join(options.root, 'package.json');
+  if (!fs.existsSync(pkgPath)) {
+    throw new Error(`No package.json found in ${options.root}. Is this an Angular project?`);
+  }
+  const pkgContent = await readFileContent(pkgPath);
   let pkg: Record<string, unknown>;
   try { pkg = JSON.parse(pkgContent); }
   catch { throw new Error(`Invalid JSON in package.json`); }
@@ -431,6 +436,32 @@ export async function run(options: GlobalOptions): Promise<void> {
     pushFiles(data.onPushRatio!.files, data.onPushRatio!.allFiles);
     lines.push(`    ${colorize('inject():    ', 'magenta')} ${injectBar}  (${data.injectRatio!.inject}/${injectTotal} files)`);
     pushFiles(data.injectRatio!.files, data.injectRatio!.allFiles);
+  }
+
+  // Threshold warnings from .ngpulserc.json
+  const config = await loadConfig(options.root);
+  if (config.thresholds) {
+    const warnings: string[] = [];
+    const { standalone, signals, lazyRoutes: lazyThreshold } = config.thresholds;
+    if (standalone !== undefined && data.standaloneRatio.total > 0) {
+      const pct = Math.round((data.standaloneRatio.standalone / data.standaloneRatio.total) * 100);
+      if (pct < standalone) warnings.push(`Standalone ${pct}% is below threshold ${standalone}%`);
+    }
+    if (signals !== undefined && data.signalUsage.totalComponentsAndServices > 0) {
+      const pct = Math.round((data.signalUsage.filesWithSignals / data.signalUsage.totalComponentsAndServices) * 100);
+      if (pct < signals) warnings.push(`Signals ${pct}% is below threshold ${signals}%`);
+    }
+    if (lazyThreshold !== undefined && data.lazyRoutes.totalRoutes > 0) {
+      const pct = Math.round((data.lazyRoutes.lazy / data.lazyRoutes.totalRoutes) * 100);
+      if (pct < lazyThreshold) warnings.push(`Lazy routes ${pct}% is below threshold ${lazyThreshold}%`);
+    }
+    if (warnings.length > 0) {
+      lines.push('');
+      lines.push(colorize('  Threshold Warnings', 'yellow'));
+      for (const w of warnings) {
+        lines.push(`    ${colorize('⚠️', 'yellow')} ${w}`);
+      }
+    }
   }
 
   lines.push('');

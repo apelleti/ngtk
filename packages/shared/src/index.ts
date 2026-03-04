@@ -4,3 +4,4 @@ export * from './workspace';
 export * from './format';
 export * from './ast';
 export * from './versions';
+export * from './config';

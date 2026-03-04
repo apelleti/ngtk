@@ -1,0 +1,8 @@
+{
+  "thresholds": {
+    "standalone": 80,
+    "signals": 50,
+    "lazyRoutes": 60
+  },
+  "ignore": ["**/legacy/**"]
+}

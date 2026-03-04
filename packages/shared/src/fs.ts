@@ -20,7 +20,8 @@ export async function getFileSize(filePath: string): Promise<number> {
 }
 
 export async function findAngularRoot(from?: string): Promise<string> {
-  let dir = from || process.cwd();
+  const start = from || process.cwd();
+  let dir = start;
   while (dir !== path.dirname(dir)) {
     if (
       fs.existsSync(path.join(dir, 'angular.json')) ||
@@ -30,7 +31,9 @@ export async function findAngularRoot(from?: string): Promise<string> {
     }
     dir = path.dirname(dir);
   }
-  return from || process.cwd();
+  throw new Error(
+    `Not an Angular project: no angular.json or project.json found in ${start} (or any parent directory). Run this command from an Angular project root, or use --root <path>.`,
+  );
 }
 
 export function fileExists(filePath: string): boolean {
