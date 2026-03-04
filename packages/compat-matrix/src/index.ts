@@ -86,7 +86,12 @@ function formatRange(range: VersionRange): string {
 export async function run(options: GlobalOptions): Promise<void> {
   const pkgPath = path.join(options.root, 'package.json');
   const pkgContent = await readFileContent(pkgPath);
-  const pkg = JSON.parse(pkgContent);
+  let pkg: Record<string, unknown>;
+  try {
+    pkg = JSON.parse(pkgContent);
+  } catch {
+    throw new Error(`Invalid JSON in ${pkgPath}`);
+  }
 
   const versions: Record<string, string> = {
     '@angular/core': readVersionFromDeps(pkg, '@angular/core'),
@@ -95,6 +100,15 @@ export async function run(options: GlobalOptions): Promise<void> {
     'zone.js': readVersionFromDeps(pkg, 'zone.js'),
     '@angular/cli': readVersionFromDeps(pkg, '@angular/cli'),
   };
+
+  if (versions['@angular/core'] === 'not found') {
+    if (options.json) {
+      console.log(JSON.stringify([], null, 2));
+    } else {
+      console.log(colorize('No @angular/core found in package.json.', 'yellow'));
+    }
+    return;
+  }
 
   const angularMajor = getMajor(versions['@angular/core']);
   if (options.verbose) console.error(`Detected Angular v${angularMajor}, checking compatibility...`);

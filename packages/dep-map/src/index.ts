@@ -52,7 +52,12 @@ function parseDeps(
 export async function run(options: GlobalOptions): Promise<void> {
   const pkgPath = path.join(options.root, 'package.json');
   const pkgContent = await readFileContent(pkgPath);
-  const pkg = JSON.parse(pkgContent);
+  let pkg: { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
+  try {
+    pkg = JSON.parse(pkgContent);
+  } catch {
+    throw new Error(`Invalid JSON in ${pkgPath}`);
+  }
 
   if (options.verbose) console.error('Parsing package.json dependencies...');
   const allDeps: DependencyInfo[] = [

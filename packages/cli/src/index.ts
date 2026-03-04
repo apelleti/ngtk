@@ -16,7 +16,7 @@ const program = new Command();
 
 program
   .name('ngtk')
-  .description('Angular Toolkit CLI — diagnostiquer, analyser et maintenir les projets Angular')
+  .description('Diagnose, analyze, and maintain Angular projects from the terminal')
   .version(pkgJson.version, '-V, --version');
 
 // Global options helper
@@ -56,7 +56,7 @@ function wrapAction(fn: (opts: RawOptions) => Promise<void>): (opts: RawOptions)
 // Register all 11 commands
 // 1. info
 globalOpts(
-  program.command('info').description('Dashboard neofetch-style du projet Angular')
+  program.command('info').description('Neofetch-style Angular project dashboard')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/info');
   await run(await getOptions(opts));
@@ -72,7 +72,7 @@ globalOpts(
 
 // 3. component-weight
 globalOpts(
-  program.command('component-weight').alias('cw').description('Classement composants par poids fichier')
+  program.command('component-weight').alias('cw').description('Rank components by total file weight')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/component-weight');
   await run(await getOptions(opts));
@@ -80,7 +80,7 @@ globalOpts(
 
 // 4. dep-map
 globalOpts(
-  program.command('dep-map').alias('deps').description('Cartographie des dépendances')
+  program.command('dep-map').alias('deps').description('Map and categorize all dependencies')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/dep-map');
   await run(await getOptions(opts));
@@ -88,7 +88,7 @@ globalOpts(
 
 // 5. orphans
 globalOpts(
-  program.command('orphans').description('Fichiers .ts/.html/.scss non référencés')
+  program.command('orphans').description('Find unreferenced .ts/.html/.scss files')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/orphans');
   await run(await getOptions(opts));
@@ -96,7 +96,7 @@ globalOpts(
 
 // 6. empty-barrel
 globalOpts(
-  program.command('empty-barrel').alias('eb').description('Fichiers boilerplate inutiles')
+  program.command('empty-barrel').alias('eb').description('Detect empty stylesheets, trivial specs, empty services')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/empty-barrel');
   await run(await getOptions(opts));
@@ -104,7 +104,7 @@ globalOpts(
 
 // 7. dead-css
 globalOpts(
-  program.command('dead-css').alias('dc').description('CSS mort par composant')
+  program.command('dead-css').alias('dc').description('Find unused CSS classes per component')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/dead-css');
   await run(await getOptions(opts));
@@ -112,7 +112,7 @@ globalOpts(
 
 // 8. route-tree
 globalOpts(
-  program.command('route-tree').alias('rt').description('Arbre ASCII des routes Angular')
+  program.command('route-tree').alias('rt').description('Print the route tree as ASCII with guards and lazy markers')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/route-tree');
   await run(await getOptions(opts));
@@ -120,7 +120,7 @@ globalOpts(
 
 // 9. component-catalog
 globalOpts(
-  program.command('component-catalog').alias('cc').description('Catalogue des composants Angular')
+  program.command('component-catalog').alias('cc').description('List all components with metadata')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/component-catalog');
   await run(await getOptions(opts));
@@ -128,7 +128,7 @@ globalOpts(
 
 // 10. compat-matrix
 globalOpts(
-  program.command('compat-matrix').alias('compat').description('Matrice de compatibilité Angular')
+  program.command('compat-matrix').alias('compat').description('Check Angular/TypeScript/RxJS/Node compatibility')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/compat-matrix');
   await run(await getOptions(opts));
@@ -136,7 +136,7 @@ globalOpts(
 
 // 11. debt-log
 globalOpts(
-  program.command('debt-log').alias('debt').description('Agrégateur TODO/FIXME/HACK')
+  program.command('debt-log').alias('debt').description('Aggregate TODO/FIXME/HACK comments with git blame')
 ).action(wrapAction(async (opts) => {
   const { run } = await import('@ngtk/debt-log');
   await run(await getOptions(opts));

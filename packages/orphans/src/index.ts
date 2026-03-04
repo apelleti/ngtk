@@ -137,7 +137,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   const referencedBasenames = new Set<string>();
 
   for (const tsFile of tsFiles) {
-    const content = await readFileContent(tsFile);
+    let content: string;
+    try {
+      content = await readFileContent(tsFile);
+    } catch {
+      continue;
+    }
     const refs = extractReferences(content, tsFile);
     for (const ref of refs) {
       allRefs.add(ref);

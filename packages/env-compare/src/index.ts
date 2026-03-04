@@ -56,8 +56,19 @@ function extractObjectKeys(content: string): string[] {
     /export\s+const\s+\w+\s*(?::\s*[^=]+)?\s*=\s*\{([\s\S]*?)\};/,
   );
   if (!objectMatch) {
+    // Fallback: match without trailing semicolon (e.g. some formatters omit it)
+    objectMatch = content.match(
+      /export\s+const\s+\w+\s*(?::\s*[^=]+)?\s*=\s*\{([\s\S]*)\}/,
+    );
+  }
+  if (!objectMatch) {
     objectMatch = content.match(
       /export\s+default\s+\{([\s\S]*?)\};/,
+    );
+  }
+  if (!objectMatch) {
+    objectMatch = content.match(
+      /export\s+default\s+\{([\s\S]*)\}/,
     );
   }
   if (!objectMatch) return keys;
@@ -87,7 +98,12 @@ async function parseEnvFiles(root: string): Promise<EnvFileKeys[]> {
   const results: EnvFileKeys[] = [];
 
   for (const filePath of envFiles) {
-    const content = await readFileContent(filePath);
+    let content: string;
+    try {
+      content = await readFileContent(filePath);
+    } catch {
+      continue;
+    }
     const keys = extractObjectKeys(content);
     results.push({
       filePath,

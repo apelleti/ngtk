@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ngtk — Angular Toolkit CLI</title>
+  <meta name="description" content="Diagnose, analyze, and maintain Angular projects from the terminal.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-terminal: #0d1117;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #00ff88;
+      --accent-dim: rgba(0, 255, 136, 0.15);
+      --cyan: #58a6ff;
+      --yellow: #e3b341;
+      --red: #f85149;
+      --magenta: #bc8cff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Fade-in on scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero .tagline {
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      color: var(--text-muted);
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      margin-bottom: 3rem;
+    }
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 24px rgba(0, 255, 136, 0.3);
+    }
+
+    .hero-terminal {
+      width: 100%;
+      max-width: 640px;
+      background: var(--bg-terminal);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-body {
+      padding: 1rem 1.25rem;
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      white-space: pre;
+      overflow-x: auto;
+      min-height: 340px;
+    }
+
+    .terminal-body .prompt {
+      color: var(--accent);
+    }
+    .terminal-body .cmd {
+      color: var(--text);
+    }
+    .terminal-body .c-cyan { color: var(--cyan); }
+    .terminal-body .c-green { color: var(--accent); }
+    .terminal-body .c-yellow { color: var(--yellow); }
+    .terminal-body .c-magenta { color: var(--magenta); }
+    .terminal-body .c-muted { color: var(--text-muted); }
+    .terminal-body .c-red { color: var(--red); }
+    .terminal-body .c-white { color: var(--text); }
+
+    /* ===== SECTION COMMON ===== */
+    section {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    section h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    section .section-sub {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+
+    /* ===== FEATURES GRID ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-card h3 code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--accent);
+      font-size: 0.9rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===== DEMO TABS ===== */
+    .demo-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+      overflow-x: auto;
+    }
+
+    .demo-tab {
+      padding: 0.6rem 1.2rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .demo-tab:hover { color: var(--text); }
+    .demo-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .demo-terminal {
+      background: var(--bg-terminal);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .demo-content {
+      padding: 1rem 1.25rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      white-space: pre;
+      overflow-x: auto;
+      min-height: 260px;
+    }
+
+    .demo-pane { display: none; }
+    .demo-pane.active { display: block; }
+
+    /* ===== INSTALL ===== */
+    .install-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .install-row {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .install-label {
+      background: var(--bg-terminal);
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-right: 1px solid var(--border);
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .install-cmd {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .install-copy {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.15s ease;
+    }
+    .install-copy:hover { color: var(--accent); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .hero-terminal { border-radius: 0; border-left: none; border-right: none; }
+      .terminal-body { font-size: 0.7rem; padding: 0.75rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .demo-content { font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <h1><span>ngtk</span></h1>
+    <p class="tagline">Diagnose, analyze, and maintain Angular projects from the terminal.</p>
+    <a class="hero-cta" href="#install">npx ngtk info</a>
+
+    <div class="hero-terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+      </div>
+      <div class="terminal-body" id="hero-term"></div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="fade-in" id="features">
+    <h2>11 Commands. Zero Config.</h2>
+    <p class="section-sub">Everything you need to understand an Angular codebase at a glance.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F4CA;</div>
+        <h3><code>info</code></h3>
+        <p>Neofetch-style project dashboard with versions, artifact counts, and health indicators.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F500;</div>
+        <h3><code>env-compare</code></h3>
+        <p>Compare environment files side-by-side and spot missing keys across envs.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x2696;&#xFE0F;</div>
+        <h3><code>component-weight</code></h3>
+        <p>Rank components by total file weight — TS + HTML + SCSS combined.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F5FA;&#xFE0F;</div>
+        <h3><code>dep-map</code></h3>
+        <p>Map all dependencies categorized as Angular, ecosystem, or generic.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F47B;</div>
+        <h3><code>orphans</code></h3>
+        <p>Find .ts, .html, .scss files not referenced by any import statement.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F5D1;&#xFE0F;</div>
+        <h3><code>empty-barrel</code></h3>
+        <p>Detect boilerplate: empty stylesheets, trivial specs, empty services.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x2702;&#xFE0F;</div>
+        <h3><code>dead-css</code></h3>
+        <p>Find unused CSS classes in each component's stylesheet.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F333;</div>
+        <h3><code>route-tree</code></h3>
+        <p>Print the full route tree as ASCII art with guards and lazy markers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F4D6;</div>
+        <h3><code>component-catalog</code></h3>
+        <p>List all components with selectors, standalone status, and change detection.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x2705;</div>
+        <h3><code>compat-matrix</code></h3>
+        <p>Check Angular / TypeScript / RxJS / Node version compatibility.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F4DD;</div>
+        <h3><code>debt-log</code></h3>
+        <p>Aggregate TODO/FIXME/HACK comments with git blame age and author.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DEMO ===== -->
+  <section class="fade-in" id="demo">
+    <h2>See It In Action</h2>
+    <p class="section-sub">Switch between commands to preview their output.</p>
+
+    <div class="demo-terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+      </div>
+      <div class="demo-tabs" id="demo-tabs"></div>
+      <div class="demo-content" id="demo-content"></div>
+    </div>
+  </section>
+
+  <!-- ===== INSTALL ===== -->
+  <section class="fade-in" id="install">
+    <h2>Get Started</h2>
+    <p class="section-sub">Run it once, no install required.</p>
+
+    <div class="install-options">
+      <div class="install-row">
+        <div class="install-label">npx</div>
+        <div class="install-cmd">npx ngtk info</div>
+        <button class="install-copy" onclick="copyCmd(this)" title="Copy">&#x1F4CB;</button>
+      </div>
+      <div class="install-row">
+        <div class="install-label">npm</div>
+        <div class="install-cmd">npm install -g @ngtk/cli</div>
+        <button class="install-copy" onclick="copyCmd(this)" title="Copy">&#x1F4CB;</button>
+      </div>
+      <div class="install-row">
+        <div class="install-label">pnpm</div>
+        <div class="install-cmd">pnpm add -g @ngtk/cli</div>
+        <button class="install-copy" onclick="copyCmd(this)" title="Copy">&#x1F4CB;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://github.com/AntoinePouworkaround/ngtk">GitHub</a>
+      <a href="https://www.npmjs.com/package/@ngtk/cli">npm</a>
+    </div>
+    <p>MIT License</p>
+  </footer>
+
+  <script>
+    // ===== HERO TYPING EFFECT =====
+    const heroLines = [
+      { text: '$ npx ngtk info\n', cls: 'prompt' },
+      { text: '\n', cls: '' },
+      { text: '╭─────────────────────────────────────────────────╮\n', cls: 'c-muted' },
+      { text: '│  ', cls: 'c-muted' }, { text: 'ngtk — Angular Project Info', cls: 'c-cyan' }, { text: '                    │\n', cls: 'c-muted' },
+      { text: '│                                                 │\n', cls: 'c-muted' },
+      { text: '│  ', cls: 'c-muted' }, { text: 'Versions', cls: 'c-cyan' }, { text: '                                       │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Angular:', cls: 'c-green' }, { text: '      ^18.2.0                        │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'TypeScript:', cls: 'c-green' }, { text: '   ~5.4.5                         │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'RxJS:', cls: 'c-green' }, { text: '         ~7.8.1                         │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Node:', cls: 'c-green' }, { text: '         v20.11.0                       │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Pkg Manager:', cls: 'c-green' }, { text: '  pnpm                           │\n', cls: 'c-muted' },
+      { text: '│                                                 │\n', cls: 'c-muted' },
+      { text: '│  ', cls: 'c-muted' }, { text: 'Artifact Counts', cls: 'c-cyan' }, { text: '                                │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Components:', cls: 'c-yellow' }, { text: '    47                            │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Services:', cls: 'c-yellow' }, { text: '      22                            │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Modules:', cls: 'c-yellow' }, { text: '       12                            │\n', cls: 'c-muted' },
+      { text: '│                                                 │\n', cls: 'c-muted' },
+      { text: '│  ', cls: 'c-muted' }, { text: 'Health Indicators', cls: 'c-cyan' }, { text: '                              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Standalone:', cls: 'c-magenta' }, { text: '   ████████░░  81%              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Signals:', cls: 'c-magenta' }, { text: '      ██████░░░░  30%              │\n', cls: 'c-muted' },
+      { text: '│    ', cls: 'c-muted' }, { text: 'Lazy Routes:', cls: 'c-magenta' }, { text: '  █████████░  86%              │\n', cls: 'c-muted' },
+      { text: '╰─────────────────────────────────────────────────╯\n', cls: 'c-muted' },
+    ];
+
+    function typeHero() {
+      const el = document.getElementById('hero-term');
+      el.innerHTML = '';
+      let segIdx = 0;
+      let charIdx = 0;
+      let currentSpan = null;
+
+      function tick() {
+        if (segIdx >= heroLines.length) return;
+        const seg = heroLines[segIdx];
+        if (!currentSpan) {
+          currentSpan = document.createElement('span');
+          if (seg.cls) currentSpan.className = seg.cls;
+          el.appendChild(currentSpan);
+        }
+        currentSpan.textContent += seg.text[charIdx];
+        charIdx++;
+        if (charIdx >= seg.text.length) {
+          segIdx++;
+          charIdx = 0;
+          currentSpan = null;
+        }
+        const delay = segIdx <= 1 ? 20 : 2;
+        requestAnimationFrame(() => setTimeout(tick, delay));
+      }
+
+      setTimeout(tick, 400);
+    }
+
+    typeHero();
+
+    // ===== DEMO TABS =====
+    const demos = {
+      'route-tree': `<span class="c-green">$ npx ngtk route-tree</span>
+
+<span class="c-white">/</span> (<span class="c-cyan">AppComponent</span>)
+├── <span class="c-white">dashboard</span> (<span class="c-cyan">DashboardComponent</span>)
+├── <span class="c-white">users</span> (<span class="c-cyan">UsersComponent</span>) <span class="c-yellow">[guard: AuthGuard]</span>
+│   ├── <span class="c-white">:id</span> (<span class="c-cyan">UserDetailComponent</span>)
+│   └── <span class="c-white">new</span> (<span class="c-cyan">UserFormComponent</span>) <span class="c-yellow">[guard: AdminGuard]</span>
+├── <span class="c-white">settings</span> <span class="c-yellow">[lazy]</span>
+│   ├── <span class="c-white">profile</span> (<span class="c-cyan">ProfileComponent</span>)
+│   └── <span class="c-white">security</span> (<span class="c-cyan">SecurityComponent</span>)
+└── <span class="c-white">**</span> (<span class="c-cyan">NotFoundComponent</span>)
+
+<span class="c-cyan">9</span> route(s), <span class="c-yellow">1</span> lazy-loaded, <span class="c-green">2</span> guarded`,
+
+      'env-compare': `<span class="c-green">$ npx ngtk env-compare</span>
+
+<span class="c-cyan">Environment File Comparison</span>
+
+Key           environment.ts  environment.prod.ts  environment.staging.ts
+───────────── ─────────────── ──────────────────── ─────────────────────
+apiUrl        <span class="c-green">&#x2713;</span>               <span class="c-green">&#x2713;</span>                    <span class="c-green">&#x2713;</span>
+production    <span class="c-green">&#x2713;</span>               <span class="c-green">&#x2713;</span>                    <span class="c-green">&#x2713;</span>
+debug         <span class="c-green">&#x2713;</span>               <span class="c-red">&#x2717;</span>                    <span class="c-green">&#x2713;</span>
+featureFlags  <span class="c-green">&#x2713;</span>               <span class="c-green">&#x2713;</span>                    <span class="c-red">&#x2717;</span>
+
+<span class="c-yellow">Missing Keys Summary</span>
+  <span class="c-red">environment.prod.ts</span>: missing <span class="c-red">1</span> key(s)
+    - debug`,
+
+      'debt-log': `<span class="c-green">$ npx ngtk debt-log</span>
+
+Type    Age            Author          Message                                    Location
+─────── ────────────── ─────────────── ────────────────────────────────────────── ─────────────────────
+<span class="c-red">FIXME</span>   2 years ago    john.doe        Race condition in auth refresh              src/auth/auth.service.ts:42
+<span class="c-yellow">TODO</span>    8 months ago   jane.smith      Add proper error handling for file upload   src/upload/upload.component.ts:89
+<span class="c-yellow">TODO</span>    3 months ago   john.doe        Migrate to standalone component             src/shared/header/header.component.ts:12
+<span class="c-magenta">HACK</span>    2 months ago   jane.smith      Workaround for zone.js timing issue        src/core/init.service.ts:55
+<span class="c-yellow">TODO</span>    1 month ago    john.doe        Implement pagination                       src/users/users.component.ts:31
+
+5 debt items: <span class="c-yellow">3 TODO</span>, <span class="c-red">1 FIXME</span>, <span class="c-magenta">1 HACK</span>`,
+
+      'dead-css': `<span class="c-green">$ npx ngtk dead-css</span>
+
+Component                    Declared  Used  Unused  Dead Classes
+──────────────────────────── ───────── ───── ─────── ─────────────────────────
+HeaderComponent              12        9     3       .header-legacy, .nav-old, .logo-sm
+UserCardComponent            8         6     2       .card-shadow-v1, .avatar-border
+DashboardComponent           15        15    0
+SettingsComponent            6         4     2       .form-hint, .btn-reset
+
+<span class="c-yellow">4</span> components scanned, <span class="c-red">7</span> dead CSS classes found`,
+
+      'compat': `<span class="c-green">$ npx ngtk compat-matrix</span>
+
+<span class="c-cyan">Angular Stack — v18 detected</span>
+
+  @angular/core:  ^18.2.0
+  typescript:     ~5.4.5
+  rxjs:           ~7.8.1
+  zone.js:        ~0.14.4
+  @angular/cli:   ^18.2.0
+  node:           v20.11.0
+
+Package          Current    Compatible  Recommended
+──────────────── ────────── ────────── ────────────
+@angular/core    ^18.2.0    <span class="c-green">&#x2713;</span>           —
+typescript       ~5.4.5     <span class="c-green">&#x2713;</span>           —
+rxjs             ~7.8.1     <span class="c-green">&#x2713;</span>           —
+zone.js          ~0.14.4    <span class="c-green">&#x2713;</span>           —
+@angular/cli     ^18.2.0    <span class="c-green">&#x2713;</span>           —
+node             20.11.0    <span class="c-green">&#x2713;</span>           —`,
+    };
+
+    function initDemoTabs() {
+      const tabsEl = document.getElementById('demo-tabs');
+      const contentEl = document.getElementById('demo-content');
+      const keys = Object.keys(demos);
+      let activeKey = keys[0];
+
+      keys.forEach((key) => {
+        const btn = document.createElement('button');
+        btn.className = 'demo-tab' + (key === activeKey ? ' active' : '');
+        btn.textContent = key;
+        btn.addEventListener('click', () => {
+          activeKey = key;
+          tabsEl.querySelectorAll('.demo-tab').forEach((t) => t.classList.remove('active'));
+          btn.classList.add('active');
+          contentEl.innerHTML = demos[key];
+        });
+        tabsEl.appendChild(btn);
+      });
+
+      contentEl.innerHTML = demos[activeKey];
+    }
+
+    initDemoTabs();
+
+    // ===== COPY BUTTON =====
+    function copyCmd(btn) {
+      const cmd = btn.previousElementSibling.textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        btn.textContent = '\u2705';
+        setTimeout(() => { btn.textContent = '\uD83D\uDCCB'; }, 1500);
+      });
+    }
+
+    // ===== FADE-IN ON SCROLL =====
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>

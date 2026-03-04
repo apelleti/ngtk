@@ -97,7 +97,12 @@ async function countLazyRoutes(root: string): Promise<{ lazy: number; totalRoute
 async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
   const pkgPath = path.join(options.root, 'package.json');
   const pkgContent = await readFileContent(pkgPath);
-  const pkg = JSON.parse(pkgContent);
+  let pkg: Record<string, unknown>;
+  try {
+    pkg = JSON.parse(pkgContent);
+  } catch {
+    throw new Error(`Invalid JSON in ${pkgPath}`);
+  }
 
   const angularVersion = readVersionFromDeps(pkg, '@angular/core');
   const typescriptVersion = readVersionFromDeps(pkg, 'typescript');

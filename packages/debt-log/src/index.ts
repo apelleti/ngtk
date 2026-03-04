@@ -19,7 +19,7 @@ async function pLimit<T>(tasks: (() => Promise<T>)[], concurrency: number): Prom
   async function worker(): Promise<void> {
     while (idx < tasks.length) {
       const i = idx++;
-      results[i] = await tasks[i]();
+      results[i] = await tasks[i]().catch(() => undefined as unknown as T);
     }
   }
 
@@ -29,7 +29,7 @@ async function pLimit<T>(tasks: (() => Promise<T>)[], concurrency: number): Prom
 }
 
 const SINGLE_LINE_RE = /\/\/\s*(TODO|FIXME|HACK)\b:?\s*(.*)/i;
-const BLOCK_COMMENT_RE = /\/\*\s*(TODO|FIXME|HACK)\b:?\s*(.*?)\*\//i;
+const BLOCK_COMMENT_RE = /\/\*\s*(TODO|FIXME|HACK)\b:?\s*([\s\S]*?)\*\//i;
 
 function formatAge(unixTimestamp: number): string {
   const now = Date.now();
@@ -100,7 +100,7 @@ async function getBlameInfoForFile(
   try {
     const { stdout } = await execFileAsync(
       'git', ['blame', '--porcelain', filePath],
-      { encoding: 'utf-8', timeout: 15000 },
+      { encoding: 'utf-8', timeout: 15000, maxBuffer: 10 * 1024 * 1024 },
     );
     return parseBlameOutput(stdout);
   } catch {
@@ -121,9 +121,6 @@ function ageToTimestamp(age: string | undefined): number {
   const match = age.match(/^(\d+)\s+(day|month|year)s?\s+ago$/);
   if (!match) {
     if (age === 'today') return 0;
-    if (age === '1 day ago') return 1;
-    if (age === '1 month ago') return 30;
-    if (age === '1 year ago') return 365;
     return Infinity;
   }
   const value = parseInt(match[1], 10);

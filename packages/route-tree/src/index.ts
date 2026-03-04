@@ -99,29 +99,41 @@ function parseRouteBlock(block: string): RouteNode | null {
     }
   }
 
-  // Extract guards from canActivate
+  // Extract guards from canActivate / canActivateChild
+  // Use bracket counting (same approach as route array parsing) to handle nested brackets
+  // e.g. canActivate: [withRole({ admin: true })]
   const guards: string[] = [];
-  const canActivateMatch = block.match(/canActivate\s*:\s*\[([^\]]*)\]/);
-  if (canActivateMatch) {
-    const guardsContent = canActivateMatch[1];
-    const guardRegex = /([A-Za-z_][\w]*)/g;
-    let guardMatch: RegExpExecArray | null;
-    while ((guardMatch = guardRegex.exec(guardsContent)) !== null) {
-      guards.push(guardMatch[1]);
+
+  function extractGuardNames(src: string, keyword: string): string[] {
+    const keywordRegex = new RegExp(keyword + '\\s*:\\s*\\[');
+    const km = src.match(keywordRegex);
+    if (!km) return [];
+    const openIdx = src.indexOf('[', km.index!);
+    if (openIdx < 0) return [];
+    const inner = extractMatchingBracket(src, openIdx);
+    if (!inner) return [];
+    // Strip nested brackets so we only capture top-level identifier names
+    let depth = 0;
+    let flat = '';
+    for (const ch of inner) {
+      if (ch === '(' || ch === '{' || ch === '[') { depth++; continue; }
+      if (ch === ')' || ch === '}' || ch === ']') { depth--; continue; }
+      if (depth === 0) flat += ch;
     }
+    const names: string[] = [];
+    const idRegex = /([A-Za-z_][\w]*)/g;
+    let m: RegExpExecArray | null;
+    while ((m = idRegex.exec(flat)) !== null) {
+      names.push(m[1]);
+    }
+    return names;
   }
 
-  // Also check canActivateChild
-  const canActivateChildMatch = block.match(/canActivateChild\s*:\s*\[([^\]]*)\]/);
-  if (canActivateChildMatch) {
-    const guardsContent = canActivateChildMatch[1];
-    const guardRegex = /([A-Za-z_][\w]*)/g;
-    let guardMatch: RegExpExecArray | null;
-    while ((guardMatch = guardRegex.exec(guardsContent)) !== null) {
-      if (!guards.includes(guardMatch[1])) {
-        guards.push(guardMatch[1]);
-      }
-    }
+  for (const name of extractGuardNames(block, 'canActivate')) {
+    guards.push(name);
+  }
+  for (const name of extractGuardNames(block, 'canActivateChild')) {
+    if (!guards.includes(name)) guards.push(name);
   }
 
   // Extract children recursively
@@ -234,7 +246,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   const allRoutes: RouteNode[][] = [];
 
   for (const file of routingFiles) {
-    const content = await readFileContent(file);
+    let content: string;
+    try {
+      content = await readFileContent(file);
+    } catch {
+      continue;
+    }
     const routes = parseRouteObjects(content);
     if (routes.length > 0) {
       if (options.verbose) {

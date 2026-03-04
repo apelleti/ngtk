@@ -68,7 +68,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   // 1. Empty SCSS files
   const scssFiles = await scanFiles(options.root, ['**/*.scss']);
   for (const file of scssFiles) {
-    const content = await readFileContent(file);
+    let content: string;
+    try {
+      content = await readFileContent(file);
+    } catch {
+      continue;
+    }
     if (isEmptyScss(content)) {
       results.push({
         filePath: path.relative(options.root, file),
@@ -81,7 +86,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   // 2. Trivial spec files
   const specFiles = await scanFiles(options.root, ['**/*.spec.ts']);
   for (const file of specFiles) {
-    const content = await readFileContent(file);
+    let content: string;
+    try {
+      content = await readFileContent(file);
+    } catch {
+      continue;
+    }
     if (isTrivialSpec(content)) {
       results.push({
         filePath: path.relative(options.root, file),
@@ -106,7 +116,12 @@ export async function run(options: GlobalOptions): Promise<void> {
   // 4. Empty templates
   const templateFiles = await scanFiles(options.root, ['**/*.component.html']);
   for (const file of templateFiles) {
-    const content = await readFileContent(file);
+    let content: string;
+    try {
+      content = await readFileContent(file);
+    } catch {
+      continue;
+    }
     if (isEmptyTemplate(content)) {
       results.push({
         filePath: path.relative(options.root, file),
