@@ -1,6 +1,17 @@
 import * as path from 'node:path';
-import type { GlobalOptions } from '@ngpulse/shared';
-import { scanFiles, readFileContent, colorize, createTable, boxDraw } from '@ngpulse/shared';
+import type { GlobalOptions, ClassDeclaration } from '@ngpulse/shared';
+import {
+  scanFiles,
+  readFileContent,
+  colorize,
+  createTable,
+  boxDraw,
+  createProject,
+  addSourceFiles,
+  getClasses,
+  getDecorator,
+  getPropsWithDecorator,
+} from '@ngpulse/shared';
 
 interface InputOutputEntry {
   component: string;
@@ -10,33 +21,49 @@ interface InputOutputEntry {
   used: boolean;
 }
 
-const INPUT_RE = /@Input\(\s*(?:['"`](\w+)['"`]\s*)?\)\s+(\w+)/g;
-const OUTPUT_RE = /@Output\(\s*(?:['"`](\w+)['"`]\s*)?\)\s+(\w+)/g;
-const SIGNAL_INPUT_RE = /(\w+)\s*=\s*input(?:<[^>]+>)?\s*\(/g;
-const SIGNAL_OUTPUT_RE = /(\w+)\s*=\s*output(?:<[^>]+>)?\s*\(/g;
-
-function extractInputsOutputs(content: string): { name: string; kind: 'input' | 'output' }[] {
+function extractInputsOutputs(cls: ClassDeclaration): { name: string; kind: 'input' | 'output' }[] {
   const results: { name: string; kind: 'input' | 'output' }[] = [];
-  let m: RegExpExecArray | null;
 
-  INPUT_RE.lastIndex = 0;
-  while ((m = INPUT_RE.exec(content)) !== null) {
-    results.push({ name: m[1] || m[2], kind: 'input' });
+  // @Input() decorated properties
+  for (const prop of getPropsWithDecorator(cls, 'Input')) {
+    const decorator = prop.getDecorator('Input')!;
+    const args = decorator.getArguments();
+    // Check for alias: @Input('aliasName')
+    let alias: string | undefined;
+    if (args.length > 0) {
+      const argText = args[0].getText().replace(/^['"`]|['"`]$/g, '');
+      // Simple string alias (not object config)
+      if (!argText.startsWith('{')) {
+        alias = argText;
+      }
+    }
+    results.push({ name: alias || prop.getName(), kind: 'input' });
   }
 
-  OUTPUT_RE.lastIndex = 0;
-  while ((m = OUTPUT_RE.exec(content)) !== null) {
-    results.push({ name: m[1] || m[2], kind: 'output' });
+  // @Output() decorated properties
+  for (const prop of getPropsWithDecorator(cls, 'Output')) {
+    const decorator = prop.getDecorator('Output')!;
+    const args = decorator.getArguments();
+    let alias: string | undefined;
+    if (args.length > 0) {
+      const argText = args[0].getText().replace(/^['"`]|['"`]$/g, '');
+      if (!argText.startsWith('{')) {
+        alias = argText;
+      }
+    }
+    results.push({ name: alias || prop.getName(), kind: 'output' });
   }
 
-  SIGNAL_INPUT_RE.lastIndex = 0;
-  while ((m = SIGNAL_INPUT_RE.exec(content)) !== null) {
-    results.push({ name: m[1], kind: 'input' });
-  }
-
-  SIGNAL_OUTPUT_RE.lastIndex = 0;
-  while ((m = SIGNAL_OUTPUT_RE.exec(content)) !== null) {
-    results.push({ name: m[1], kind: 'output' });
+  // Signal-based input()/output() properties
+  for (const prop of cls.getProperties()) {
+    const init = prop.getInitializer();
+    if (!init) continue;
+    const text = init.getText();
+    if (/^input\s*[<(]/.test(text) || /^input\.required\s*[<(]/.test(text)) {
+      results.push({ name: prop.getName(), kind: 'input' });
+    } else if (/^output\s*[<(]/.test(text)) {
+      results.push({ name: prop.getName(), kind: 'output' });
+    }
   }
 
   return results;
@@ -51,12 +78,9 @@ const HTML_STANDARD_ATTRS = new Set([
 function isUsedInTemplate(name: string, kind: 'input' | 'output', templates: string[]): boolean {
   for (const tpl of templates) {
     if (kind === 'input') {
-      // [inputName]="..."
       if (new RegExp(`\\[${name}\\]\\s*=`).test(tpl)) return true;
-      // Static attribute inputName="..." — only if not a standard HTML attribute
       if (!HTML_STANDARD_ATTRS.has(name) && new RegExp(`\\b${name}\\s*=\\s*"`, 'i').test(tpl)) return true;
     } else {
-      // (outputName)="..."
       if (new RegExp(`\\(${name}\\)\\s*=`).test(tpl)) return true;
     }
   }
@@ -74,21 +98,27 @@ export async function run(options: GlobalOptions): Promise<void> {
     templates.push(await readFileContent(f));
   }
 
+  const project = createProject();
+  const sfList = addSourceFiles(project, tsFiles);
   const entries: InputOutputEntry[] = [];
 
-  for (const tsFile of tsFiles) {
-    const content = await readFileContent(tsFile);
-    const componentName = path.basename(tsFile, '.component.ts');
-    const ios = extractInputsOutputs(content);
+  for (const sf of sfList) {
+    const filePath = sf.getFilePath();
+    const componentName = path.basename(filePath, '.component.ts');
 
-    for (const io of ios) {
-      entries.push({
-        component: componentName,
-        filePath: path.relative(root, tsFile),
-        name: io.name,
-        kind: io.kind,
-        used: isUsedInTemplate(io.name, io.kind, templates),
-      });
+    for (const cls of getClasses(sf)) {
+      if (!getDecorator(cls, 'Component')) continue;
+
+      const ios = extractInputsOutputs(cls);
+      for (const io of ios) {
+        entries.push({
+          component: componentName,
+          filePath: path.relative(root, filePath),
+          name: io.name,
+          kind: io.kind,
+          used: isUsedInTemplate(io.name, io.kind, templates),
+        });
+      }
     }
   }
 
