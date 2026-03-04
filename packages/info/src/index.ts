@@ -69,8 +69,8 @@ async function detectBuildTool(root: string): Promise<string> {
     if (raw.includes('@angular-devkit/build-angular:application')) return 'esbuild';
     if (raw.includes('@angular-devkit/build-angular:browser')) return 'webpack';
     const json = JSON.parse(raw);
-    for (const proj of Object.values(json.projects || {}) as any[]) {
-      const builder: string = proj?.architect?.build?.builder || proj?.targets?.build?.executor || '';
+    for (const proj of Object.values(json.projects || {}) as Record<string, unknown>[]) {
+      const builder: string = (proj as {architect?: {build?: {builder?: string}}, targets?: {build?: {executor?: string}}})?.architect?.build?.builder || (proj as {targets?: {build?: {executor?: string}}})?.targets?.build?.executor || '';
       if (builder.includes('esbuild') || builder.includes('application')) return 'esbuild';
       if (builder.includes('browser')) return 'webpack';
     }
@@ -102,7 +102,7 @@ async function detectZoneless(root: string): Promise<boolean> {
 }
 
 function detectFromDeps(pkg: Record<string, unknown>, name: string): boolean {
-  const all = { ...((pkg['dependencies'] as any) || {}), ...((pkg['devDependencies'] as any) || {}) };
+  const all = { ...((pkg['dependencies'] as Record<string, string>) || {}), ...((pkg['devDependencies'] as Record<string, string>) || {}) };
   return name in all;
 }
 
@@ -354,7 +354,7 @@ export async function run(options: GlobalOptions): Promise<void> {
   lines.push('');
   lines.push(colorize('  Versions', 'cyan'));
   const angularDisplay = data.versions.angularInstalled
-    ? `${data.versions.angular} ${colorize(`(installed: ${data.versions.angularInstalled})`, 'gray' as any)}`
+    ? `${data.versions.angular} ${colorize(`(installed: ${data.versions.angularInstalled})`, 'white')}`
     : data.versions.angular;
   lines.push(`    ${colorize('Angular:', 'green')}      ${angularDisplay}`);
   lines.push(`    ${colorize('TypeScript:', 'green')}   ${data.versions.typescript}`);
@@ -409,7 +409,7 @@ export async function run(options: GlobalOptions): Promise<void> {
       if (matchSet.has(f)) {
         lines.push(`      ${colorize('✓', 'green')} ${f}`);
       } else {
-        lines.push(`      ${colorize('·', 'gray' as any)} ${colorize(f, 'gray' as any)}`);
+        lines.push(`      ${colorize('·', 'white')} ${colorize(f, 'white')}`);
       }
     }
   };

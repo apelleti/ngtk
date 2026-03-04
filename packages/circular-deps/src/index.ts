@@ -177,7 +177,6 @@ export async function run(options: GlobalOptions): Promise<void> {
   for (const file of tsFiles) {
     const content = await readFileContent(file);
     const deps: string[] = [];
-    const lines = content.split('\n');
     const fileImportLines = new Map<string, number>();
     let m: RegExpExecArray | null;
 

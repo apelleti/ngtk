@@ -29,7 +29,6 @@ async function pLimit<T>(tasks: (() => Promise<T>)[], concurrency: number): Prom
 }
 
 const SINGLE_LINE_RE = /\/\/\s*(TODO|FIXME|HACK)\b:?\s*(.*)/i;
-const BLOCK_COMMENT_RE = /\/\*\s*(TODO|FIXME|HACK)\b:?\s*([\s\S]*?)\*\//i;
 
 function formatAge(unixTimestamp: number): string {
   const now = Date.now();

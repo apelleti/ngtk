@@ -14,7 +14,7 @@ interface SignalCandidate {
 const INPUT_DECORATOR_RE =
   /@Input\(\s*(?:\{[^}]*\}\s*|['"`]\w+['"`]\s*)?\)\s+(\w+)\s*(?::\s*([^;=]+?))?(?:\s*=\s*([^;]+))?\s*;/g;
 const SIMPLE_PROP_RE =
-  /^\s+((?:public|protected|private)\s+)?(?:readonly\s+)?(\w+)\s*(?::\s*(\w[\w<>\[\], |&?]*))?\s*=\s*([^;]+);/gm;
+  /^\s+((?:public|protected|private)\s+)?(?:readonly\s+)?(\w+)\s*(?::\s*(\w[\w<>[\], |&?]*))?\s*=\s*([^;]+);/gm;
 
 function extractInputCandidates(content: string): SignalCandidate[] {
   const candidates: SignalCandidate[] = [];

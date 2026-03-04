@@ -47,7 +47,7 @@ export async function run(options: GlobalOptions): Promise<void> {
     // Check for styles outside :host (only in component styles)
     if (file.includes('.component.')) {
       const hasHost = content.includes(':host');
-      const hasRules = /^\s*[.#\w\[\*].*\{/m.test(content);
+      const hasRules = /^\s*[.#\w[*].*\{/m.test(content);
       if (hasRules && !hasHost) {
         issues.push({
           file: relPath,
