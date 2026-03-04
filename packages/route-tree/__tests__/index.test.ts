@@ -56,7 +56,7 @@ describe('@ngpulse/route-tree', () => {
   });
 
   it('shows no routes message for project with no routing files', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-rt-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-rt-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: false, verbose: false });

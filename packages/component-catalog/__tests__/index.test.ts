@@ -41,7 +41,7 @@ describe('@ngpulse/component-catalog', () => {
   });
 
   it('returns empty array for project with no components', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-cc-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-cc-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false });

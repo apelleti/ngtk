@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-const CLI_PATH = path.resolve(__dirname, '..', 'bin', 'ngtk.js');
+const CLI_PATH = path.resolve(__dirname, '..', 'bin', 'ngpulse.js');
 const FIXTURES = path.resolve(__dirname, '../../../fixtures');
 
 async function runCli(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
@@ -53,7 +53,7 @@ describe('@ngpulse/cli', () => {
   });
 
   it('wrapAction catches errors and shows user-friendly message', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-cli-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-cli-'));
     try {
       // No angular.json, no package.json → should produce a clean error
       const { stderr, exitCode } = await runCli(['info', '--root', tmpDir]);
@@ -67,7 +67,7 @@ describe('@ngpulse/cli', () => {
   });
 
   it('--verbose shows stack trace on error', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-cli-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-cli-'));
     try {
       const { stderr } = await runCli(['info', '--root', tmpDir, '--verbose']);
       expect(stderr).toContain('Error');

@@ -51,7 +51,7 @@ describe('@ngpulse/hardcoded-secrets', () => {
   });
 
   it('returns no findings for clean project', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-hs-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-hs-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false, more: false });

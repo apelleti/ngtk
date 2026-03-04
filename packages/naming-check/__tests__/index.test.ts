@@ -43,7 +43,7 @@ describe('@ngpulse/naming-check', () => {
   });
 
   it('returns empty for project with no TS files', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-nc-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-nc-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false, more: false });

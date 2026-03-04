@@ -35,7 +35,7 @@ describe('@ngpulse/circular-deps', () => {
   });
 
   it('returns no cycles for empty project', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-cd-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-cd-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false, more: false });

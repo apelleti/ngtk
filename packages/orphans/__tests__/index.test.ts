@@ -39,7 +39,7 @@ describe('@ngpulse/orphans', () => {
   });
 
   it('returns empty array for a project with no .ts files', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-orphans-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-orphans-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false });

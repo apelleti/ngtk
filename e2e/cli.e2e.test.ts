@@ -21,7 +21,7 @@ async function runCli(args: string[]): Promise<{ stdout: string; stderr: string;
   }
 }
 
-describe('ngtk CLI E2E', () => {
+describe('ngpulse CLI E2E', () => {
   it('info exits 0 and shows component count', async () => {
     const { stdout, exitCode } = await runCli(['info']);
     expect(exitCode).toBe(0);

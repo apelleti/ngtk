@@ -41,7 +41,7 @@ describe('@ngpulse/compat-matrix', () => {
   });
 
   it('handles unknown Angular version gracefully', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-compat-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-compat-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       name: 'test',
@@ -77,7 +77,7 @@ describe('@ngpulse/compat-matrix', () => {
   });
 
   it('throws on malformed package.json', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-compat-bad-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-compat-bad-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{ NOT VALID JSON }');
     try {

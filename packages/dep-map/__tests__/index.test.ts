@@ -45,7 +45,7 @@ describe('@ngpulse/dep-map', () => {
   });
 
   it('handles minimal package.json with only one dep', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-dm-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-dm-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       name: 'test', dependencies: { '@angular/core': '^17.0.0' },
@@ -72,7 +72,7 @@ describe('@ngpulse/dep-map', () => {
   });
 
   it('throws on malformed package.json', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-dm-bad-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-dm-bad-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{ INVALID }');
     try {

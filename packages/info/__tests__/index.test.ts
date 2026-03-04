@@ -63,7 +63,7 @@ describe('@ngpulse/info', () => {
   });
 
   it('throws on missing package.json', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-info-bad-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-info-bad-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await expect(run({ root: tmpDir, json: true, verbose: false })).rejects.toThrow();

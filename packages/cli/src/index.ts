@@ -15,7 +15,7 @@ try {
 const program = new Command();
 
 program
-  .name('ngtk')
+  .name('ngpulse')
   .description('Diagnose, analyze, and maintain Angular projects from the terminal')
   .version(pkgJson.version, '-V, --version');
 

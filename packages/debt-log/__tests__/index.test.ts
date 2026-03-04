@@ -43,7 +43,7 @@ describe('@ngpulse/debt-log', () => {
   });
 
   it('returns empty for project with no debt comments', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-debt-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-debt-'));
     const srcDir = path.join(tmpDir, 'src');
     fs.mkdirSync(srcDir, { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
@@ -75,7 +75,7 @@ describe('@ngpulse/debt-log', () => {
   });
 
   it('handles directory with no .ts files gracefully', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-debt-empty-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-debt-empty-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false });

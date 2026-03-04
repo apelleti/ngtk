@@ -33,7 +33,7 @@ describe('@ngpulse/test-coverage', () => {
   beforeEach(() => {
     output = [];
     console.log = (...args: any[]) => { output.push(args.map(String).join(' ')); };
-    tmpWithCoverage = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-tc-cov-'));
+    tmpWithCoverage = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-tc-cov-'));
     fs.mkdirSync(path.join(tmpWithCoverage, 'coverage'));
     fs.writeFileSync(
       path.join(tmpWithCoverage, 'coverage', 'coverage-summary.json'),
@@ -60,7 +60,7 @@ describe('@ngpulse/test-coverage', () => {
   });
 
   it('shows helpful message when no coverage file exists', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-tc-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-tc-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: true, verbose: false, more: false });

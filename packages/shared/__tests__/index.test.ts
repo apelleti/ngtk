@@ -43,7 +43,7 @@ describe('@ngpulse/shared', () => {
   });
 
   it('parseAngularWorkspace throws when no angular.json or project.json', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-ws-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-ws-'));
     try {
       await expect(parseAngularWorkspace(tmpDir)).rejects.toThrow('No angular.json');
     } finally {
@@ -154,7 +154,7 @@ describe('@ngpulse/shared', () => {
   });
 
   it('parseAngularWorkspace throws on malformed JSON', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-badjson-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-badjson-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{ INVALID JSON }}}');
     try {
       await expect(parseAngularWorkspace(tmpDir)).rejects.toThrow('Invalid JSON');

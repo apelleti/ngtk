@@ -47,7 +47,7 @@ describe('@ngpulse/env-compare', () => {
   });
 
   it('reports no files when project has no environment*.ts', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-env-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-env-'));
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');
     try {
       await run({ root: tmpDir, json: false, verbose: false });
@@ -59,7 +59,7 @@ describe('@ngpulse/env-compare', () => {
   });
 
   it('handles env file with only 2 keys', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngtk-env-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngpulse-env-'));
     const srcDir = path.join(tmpDir, 'src', 'environments');
     fs.mkdirSync(srcDir, { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'angular.json'), '{"projects":{}}');

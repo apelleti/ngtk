@@ -5,7 +5,7 @@
 **The Angular project health CLI**
 
 [![npm](https://img.shields.io/npm/v/@ngpulse/cli?color=e63946&style=flat-square)](https://www.npmjs.com/package/@ngpulse/cli)
-[![CI](https://img.shields.io/github/actions/workflow/status/apelleti/ngtk/ci.yml?style=flat-square&label=CI)](https://github.com/apelleti/ngtk/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/apelleti/ngpulse/ci.yml?style=flat-square&label=CI)](https://github.com/apelleti/ngpulse/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-457b9d?style=flat-square)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-3178c6?style=flat-square)](https://www.typescriptlang.org/)
 
@@ -177,8 +177,8 @@ npx @ngpulse/cli debt-log --json > debt-report.json
 ## Contributing
 
 ```bash
-git clone https://github.com/apelleti/ngtk.git
-cd ngtk
+git clone https://github.com/apelleti/ngpulse.git
+cd ngpulse
 pnpm install
 pnpm build
 pnpm test
