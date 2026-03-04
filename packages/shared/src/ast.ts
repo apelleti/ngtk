@@ -143,7 +143,9 @@ export function addSourceFiles(project: Project, files: string[], verbose = fals
   const sourceFiles: SourceFile[] = [];
   for (const filePath of files) {
     try {
-      sourceFiles.push(project.addSourceFileAtPath(filePath));
+      // getSourceFile avoids re-reading from disk if already added to this project
+      const existing = project.getSourceFile(filePath);
+      sourceFiles.push(existing ?? project.addSourceFileAtPath(filePath));
     } catch (err) {
       if (verbose) {
         console.error(`Warning: could not parse ${filePath}: ${err instanceof Error ? err.message : err}`);

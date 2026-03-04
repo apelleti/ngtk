@@ -91,13 +91,12 @@ function extractPropertyCandidates(cls: ClassDeclaration): SignalCandidate[] {
     const scope = prop.getScope();
     if (scope === 'private') continue;
 
-    // Only simple primitive values or arrays/objects
+    // Only simple primitives — skip arrays and object literals (may contain
+    // function calls, service refs, or complex expressions that break signal())
     const isSimple =
       /^['"`]/.test(value) ||
       /^\d/.test(value) ||
-      /^(true|false|null|undefined)$/.test(value) ||
-      /^\[/.test(value) ||
-      /^\{/.test(value);
+      /^(true|false|null|undefined)$/.test(value);
     if (!isSimple) continue;
 
     const typeNode = prop.getTypeNode();

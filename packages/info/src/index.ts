@@ -157,11 +157,11 @@ async function detectProjectInfo(root: string): Promise<{ name: string; type: st
   return { name: path.basename(root), type: 'application' };
 }
 
-async function countLinesOfCode(root: string): Promise<{ ts: number; html: number; scss: number; total: number }> {
+async function countLinesOfCode(root: string, ignore: string[] = []): Promise<{ ts: number; html: number; scss: number; total: number }> {
   const [tsFiles, htmlFiles, scssFiles] = await Promise.all([
-    scanFiles(root, ['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts']),
-    scanFiles(root, ['**/*.html']),
-    scanFiles(root, ['**/*.scss', '**/*.css']),
+    scanFiles(root, ['**/*.ts', '!**/*.spec.ts', '!**/*.d.ts'], ignore),
+    scanFiles(root, ['**/*.html'], ignore),
+    scanFiles(root, ['**/*.scss', '**/*.css'], ignore),
   ]);
   const countLines = async (files: string[]) => {
     let total = 0;
@@ -198,11 +198,11 @@ async function detectOnPushRatio(root: string, components: ComponentMeta[], proj
   return { onPush, total: components.length, files, allFiles };
 }
 
-async function detectInjectRatio(root: string, project: Project): Promise<{ inject: number; constructor: number; files: string[]; allFiles: string[] }> {
+async function detectInjectRatio(root: string, project: Project, ignore: string[] = []): Promise<{ inject: number; constructor: number; files: string[]; allFiles: string[] }> {
   const scanned = await scanFiles(root, [
     '**/*.component.ts', '**/*.service.ts', '**/*.guard.ts', '**/*.interceptor.ts',
     '!**/*.spec.ts',
-  ]);
+  ], ignore);
   let injectCount = 0, constructorCount = 0;
   const injectFiles: string[] = [];
   const sourceFiles = addSourceFiles(project, scanned);
@@ -241,11 +241,11 @@ async function detectInjectRatio(root: string, project: Project): Promise<{ inje
   return { inject: injectCount, constructor: constructorCount, files: injectFiles, allFiles: scanned.map(f => path.relative(root, f)) };
 }
 
-async function countSignalUsage(root: string, project: Project): Promise<{ filesWithSignals: number; totalComponentsAndServices: number; files: string[]; allFiles: string[] }> {
+async function countSignalUsage(root: string, project: Project, ignore: string[] = []): Promise<{ filesWithSignals: number; totalComponentsAndServices: number; files: string[]; allFiles: string[] }> {
   const scanned = await scanFiles(root, [
     '**/*.component.ts', '**/*.service.ts',
     '!**/*.spec.ts', '!**/*.d.ts',
-  ]);
+  ], ignore);
   const SIGNAL_FUNCTIONS = ['signal', 'computed', 'effect', 'input', 'output', 'model'];
   let filesWithSignals = 0;
   const signalFiles: string[] = [];
@@ -291,10 +291,10 @@ async function countSignalUsage(root: string, project: Project): Promise<{ files
   return { filesWithSignals, totalComponentsAndServices: scanned.length, files: signalFiles, allFiles: scanned.map(f => path.relative(root, f)) };
 }
 
-async function countLazyRoutes(root: string, project: Project): Promise<{ lazy: number; totalRoutes: number; files: string[]; allFiles: string[] }> {
+async function countLazyRoutes(root: string, project: Project, ignore: string[] = []): Promise<{ lazy: number; totalRoutes: number; files: string[]; allFiles: string[] }> {
   const routeFiles = await scanFiles(root, [
     '**/*routing*.ts', '**/*routes*.ts', '**/*.routes.ts', '**/app.config.ts',
-  ]);
+  ], ignore);
   let lazy = 0, total = 0;
   const lazyFiles: string[] = [];
   const sourceFiles = addSourceFiles(project, routeFiles);
@@ -336,6 +336,10 @@ async function countLazyRoutes(root: string, project: Project): Promise<{ lazy: 
 }
 
 async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
+  // Load config early so ignore patterns apply to all scans below
+  const config = await loadConfig(options.root);
+  const ignorePatterns = config.ignore ?? [];
+
   const pkgPath = path.join(options.root, 'package.json');
   if (!fs.existsSync(pkgPath)) {
     throw new Error(`No package.json found in ${options.root}. Is this an Angular project?`);
@@ -362,16 +366,16 @@ async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
   ]);
 
   const [pipes, directives, guards, interceptors, modules] = await Promise.all([
-    scanFiles(options.root, ['**/*.pipe.ts']),
-    scanFiles(options.root, ['**/*.directive.ts']),
-    scanFiles(options.root, ['**/*.guard.ts']),
-    scanFiles(options.root, ['**/*.interceptor.ts']),
-    scanFiles(options.root, ['**/*.module.ts']),
+    scanFiles(options.root, ['**/*.pipe.ts'], ignorePatterns),
+    scanFiles(options.root, ['**/*.directive.ts'], ignorePatterns),
+    scanFiles(options.root, ['**/*.guard.ts'], ignorePatterns),
+    scanFiles(options.root, ['**/*.interceptor.ts'], ignorePatterns),
+    scanFiles(options.root, ['**/*.module.ts'], ignorePatterns),
   ]);
 
   const [signalUsage, lazyRoutes] = await Promise.all([
-    countSignalUsage(options.root, project),
-    countLazyRoutes(options.root, project),
+    countSignalUsage(options.root, project, ignorePatterns),
+    countLazyRoutes(options.root, project, ignorePatterns),
   ]);
 
   let linesOfCode: InfoData['linesOfCode'];
@@ -380,9 +384,9 @@ async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
 
   if (options.more) {
     [linesOfCode, onPushRatio, injectRatio] = await Promise.all([
-      countLinesOfCode(options.root),
+      countLinesOfCode(options.root, ignorePatterns),
       detectOnPushRatio(options.root, components, project),
-      detectInjectRatio(options.root, project),
+      detectInjectRatio(options.root, project, ignorePatterns),
     ]);
   }
 

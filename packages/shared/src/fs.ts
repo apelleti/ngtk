@@ -2,11 +2,17 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import fg from 'fast-glob';
 
-export async function scanFiles(root: string, patterns: string[]): Promise<string[]> {
+const DEFAULT_IGNORE = ['**/node_modules/**', '**/dist/**', '**/.git/**'];
+
+export async function scanFiles(
+  root: string,
+  patterns: string[],
+  extraIgnore: string[] = [],
+): Promise<string[]> {
   return fg(patterns, {
     cwd: root,
     absolute: true,
-    ignore: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
+    ignore: [...DEFAULT_IGNORE, ...extraIgnore],
   });
 }
 
