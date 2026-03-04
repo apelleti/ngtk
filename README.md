@@ -189,3 +189,21 @@ packages/
 ## License
 
 MIT
+
+---
+
+## Packages
+
+All packages are published individually under the `@ngpulse` scope:
+
+| Package | npm |
+|---|---|
+| `@ngpulse/cli` | [![npm](https://img.shields.io/npm/v/@ngpulse/cli.svg)](https://www.npmjs.com/package/@ngpulse/cli) |
+| `@ngpulse/info` | [![npm](https://img.shields.io/npm/v/@ngpulse/info.svg)](https://www.npmjs.com/package/@ngpulse/info) |
+| `@ngpulse/circular-deps` | [![npm](https://img.shields.io/npm/v/@ngpulse/circular-deps.svg)](https://www.npmjs.com/package/@ngpulse/circular-deps) |
+| `@ngpulse/dead-css` | [![npm](https://img.shields.io/npm/v/@ngpulse/dead-css.svg)](https://www.npmjs.com/package/@ngpulse/dead-css) |
+| `@ngpulse/debt-log` | [![npm](https://img.shields.io/npm/v/@ngpulse/debt-log.svg)](https://www.npmjs.com/package/@ngpulse/debt-log) |
+| `@ngpulse/orphans` | [![npm](https://img.shields.io/npm/v/@ngpulse/orphans.svg)](https://www.npmjs.com/package/@ngpulse/orphans) |
+| `@ngpulse/migration-hints` | [![npm](https://img.shields.io/npm/v/@ngpulse/migration-hints.svg)](https://www.npmjs.com/package/@ngpulse/migration-hints) |
+| `@ngpulse/hardcoded-secrets` | [![npm](https://img.shields.io/npm/v/@ngpulse/hardcoded-secrets.svg)](https://www.npmjs.com/package/@ngpulse/hardcoded-secrets) |
+| `@ngpulse/signal-migrate` | [![npm](https://img.shields.io/npm/v/@ngpulse/signal-migrate.svg)](https://www.npmjs.com/package/@ngpulse/signal-migrate) |
