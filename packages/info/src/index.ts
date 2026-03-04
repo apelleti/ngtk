@@ -3,6 +3,7 @@ import * as fs from 'node:fs';
 import {
   type GlobalOptions,
   type ComponentMeta,
+  type Project,
   scanFiles,
   readFileContent,
   readVersionFromDeps,
@@ -14,6 +15,12 @@ import {
   progressBar,
   loadConfig,
   detectNxWorkspace,
+  addSourceFiles,
+  getClasses,
+  getDecorator,
+  getDecoratorProp,
+  importsFrom,
+  getConstructorParams,
 } from '@ngpulse/shared';
 
 interface InfoData {
@@ -169,55 +176,114 @@ async function countLinesOfCode(root: string): Promise<{ ts: number; html: numbe
   return { ts, html, scss, total: ts + html + scss };
 }
 
-async function detectOnPushRatio(root: string, components: ComponentMeta[]): Promise<{ onPush: number; total: number; files: string[]; allFiles: string[] }> {
+async function detectOnPushRatio(root: string, components: ComponentMeta[], project: Project): Promise<{ onPush: number; total: number; files: string[]; allFiles: string[] }> {
   let onPush = 0;
   const files: string[] = [];
   const allFiles = components.map(c => path.relative(root, c.filePath));
   for (const comp of components) {
     try {
-      const c = await readFileContent(comp.filePath);
-      if (c.includes('ChangeDetectionStrategy.OnPush')) {
-        onPush++;
-        files.push(path.relative(root, comp.filePath));
+      const sf = project.getSourceFile(comp.filePath) ?? project.addSourceFileAtPath(comp.filePath);
+      for (const cls of getClasses(sf)) {
+        const dec = getDecorator(cls, 'Component');
+        if (!dec) continue;
+        const cdProp = getDecoratorProp(dec, 'changeDetection');
+        if (cdProp && cdProp.includes('OnPush')) {
+          onPush++;
+          files.push(path.relative(root, comp.filePath));
+        }
       }
     } catch { /* skip */ }
   }
   return { onPush, total: components.length, files, allFiles };
 }
 
-async function detectInjectRatio(root: string): Promise<{ inject: number; constructor: number; files: string[]; allFiles: string[] }> {
+async function detectInjectRatio(root: string, project: Project): Promise<{ inject: number; constructor: number; files: string[]; allFiles: string[] }> {
   const scanned = await scanFiles(root, [
     '**/*.component.ts', '**/*.service.ts', '**/*.guard.ts', '**/*.interceptor.ts',
     '!**/*.spec.ts',
   ]);
   let injectCount = 0, constructorCount = 0;
   const injectFiles: string[] = [];
-  for (const f of scanned) {
+  const sourceFiles = addSourceFiles(project, scanned);
+  for (const sf of sourceFiles) {
     try {
-      const c = await readFileContent(f);
-      const hasInject = /\binject\s*\(/.test(c) && /@angular\/core/.test(c);
-      const hasConstructorDI = /constructor\s*\([^)]*:\s*[A-Z]/.test(c);
-      if (hasInject) { injectCount++; injectFiles.push(path.relative(root, f)); }
-      else if (hasConstructorDI) constructorCount++;
+      const filePath = sf.getFilePath();
+      const hasAngularCore = importsFrom(sf, '@angular/core');
+      if (!hasAngularCore) continue;
+
+      let fileHasInject = false;
+      let fileHasCtorDI = false;
+
+      for (const cls of getClasses(sf)) {
+        // Check for inject() calls in class properties
+        for (const prop of cls.getProperties()) {
+          const init = prop.getInitializer();
+          if (init && init.getText().includes('inject(')) {
+            fileHasInject = true;
+          }
+        }
+        // Check constructor params with types (constructor DI)
+        const params = getConstructorParams(cls);
+        if (params.length > 0 && params.some(p => p.getType().getText() !== '')) {
+          fileHasCtorDI = true;
+        }
+      }
+
+      if (fileHasInject) {
+        injectCount++;
+        injectFiles.push(path.relative(root, filePath));
+      } else if (fileHasCtorDI) {
+        constructorCount++;
+      }
     } catch { /* skip */ }
   }
   return { inject: injectCount, constructor: constructorCount, files: injectFiles, allFiles: scanned.map(f => path.relative(root, f)) };
 }
 
-async function countSignalUsage(root: string): Promise<{ filesWithSignals: number; totalComponentsAndServices: number; files: string[]; allFiles: string[] }> {
+async function countSignalUsage(root: string, project: Project): Promise<{ filesWithSignals: number; totalComponentsAndServices: number; files: string[]; allFiles: string[] }> {
   const scanned = await scanFiles(root, [
     '**/*.component.ts', '**/*.service.ts',
     '!**/*.spec.ts', '!**/*.d.ts',
   ]);
+  const SIGNAL_FUNCTIONS = ['signal', 'computed', 'effect', 'input', 'output', 'model'];
   let filesWithSignals = 0;
   const signalFiles: string[] = [];
-  for (const f of scanned) {
+  const sourceFiles = addSourceFiles(project, scanned);
+  for (const sf of sourceFiles) {
     try {
-      const c = await readFileContent(f);
-      if (!/@angular\/core/.test(c)) continue;
-      if (/\bsignal\s*\(/.test(c) || /\bcomputed\s*\(/.test(c)) {
-        filesWithSignals++;
-        signalFiles.push(path.relative(root, f));
+      const filePath = sf.getFilePath();
+      if (!importsFrom(sf, '@angular/core')) continue;
+
+      // Check if any signal-related import names are present
+      const importedNames = new Set<string>();
+      for (const imp of sf.getImportDeclarations()) {
+        if (imp.getModuleSpecifierValue() === '@angular/core') {
+          for (const named of imp.getNamedImports()) {
+            importedNames.add(named.getName());
+          }
+        }
+      }
+
+      const hasSignalImport = SIGNAL_FUNCTIONS.some(fn => importedNames.has(fn));
+      if (hasSignalImport) {
+        // Verify actual usage in class properties
+        let found = false;
+        for (const cls of getClasses(sf)) {
+          for (const prop of cls.getProperties()) {
+            const init = prop.getInitializer();
+            if (!init) continue;
+            const text = init.getText();
+            if (SIGNAL_FUNCTIONS.some(fn => text.includes(`${fn}(`))) {
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+        if (found) {
+          filesWithSignals++;
+          signalFiles.push(path.relative(root, filePath));
+        }
       }
     } catch { /* skip */ }
   }
@@ -277,7 +343,7 @@ async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
   ]);
 
   const [signalUsage, lazyRoutes] = await Promise.all([
-    countSignalUsage(options.root),
+    countSignalUsage(options.root, project),
     countLazyRoutes(options.root),
   ]);
 
@@ -288,8 +354,8 @@ async function gatherInfoData(options: GlobalOptions): Promise<InfoData> {
   if (options.more) {
     [linesOfCode, onPushRatio, injectRatio] = await Promise.all([
       countLinesOfCode(options.root),
-      detectOnPushRatio(options.root, components),
-      detectInjectRatio(options.root),
+      detectOnPushRatio(options.root, components, project),
+      detectInjectRatio(options.root, project),
     ]);
   }
 
