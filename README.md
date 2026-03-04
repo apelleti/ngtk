@@ -1,7 +1,7 @@
 # ngtk
 
 [![npm version](https://img.shields.io/npm/v/@ngtk/cli.svg)](https://www.npmjs.com/package/@ngtk/cli)
-[![CI](https://github.com/AntoinePouworkaround/ngtk/actions/workflows/ci.yml/badge.svg)](https://github.com/AntoinePouworkaround/ngtk/actions)
+[![CI](https://github.com/apelleti/ngtk/actions/workflows/ci.yml/badge.svg)](https://github.com/apelleti/ngtk/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-3178c6.svg)](https://www.typescriptlang.org/)
 
@@ -142,7 +142,7 @@ npx ngtk dep-map            # all deps grouped by Angular / ecosystem / generic
 ## Contributing
 
 ```bash
-git clone https://github.com/AntoinePouworkaround/ngtk.git
+git clone https://github.com/apelleti/ngtk.git
 cd ngtk
 pnpm install
 pnpm build
