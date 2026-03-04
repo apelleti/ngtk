@@ -1,0 +1,7 @@
+{
+  "name": "shared-lib",
+  "projectType": "library",
+  "root": "libs/shared-lib",
+  "sourceRoot": "libs/shared-lib/src",
+  "tags": ["type:lib", "scope:shared"]
+}

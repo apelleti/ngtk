@@ -1,0 +1,9 @@
+{
+  "npmScope": "myorg",
+  "defaultProject": "demo-app",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import {
   colorize,
   progressBar,
   loadConfig,
+  detectNxWorkspace,
 } from '@ngpulse/shared';
 
 interface InfoData {
@@ -436,6 +437,22 @@ export async function run(options: GlobalOptions): Promise<void> {
     pushFiles(data.onPushRatio!.files, data.onPushRatio!.allFiles);
     lines.push(`    ${colorize('inject():    ', 'magenta')} ${injectBar}  (${data.injectRatio!.inject}/${injectTotal} files)`);
     pushFiles(data.injectRatio!.files, data.injectRatio!.allFiles);
+  }
+
+  // NX Workspace section
+  const nxWorkspace = await detectNxWorkspace(options.root);
+  if (nxWorkspace.isNx) {
+    lines.push('');
+    lines.push(colorize('  NX Workspace', 'cyan'));
+    if (nxWorkspace.defaultProject) {
+      lines.push(`    ${colorize('Default:', 'green')}      ${nxWorkspace.defaultProject}`);
+    }
+    lines.push(`    ${colorize('Projects:', 'green')}     ${nxWorkspace.projects.length}`);
+    for (const proj of nxWorkspace.projects) {
+      const typeColor = proj.type === 'app' ? 'green' : proj.type === 'lib' ? 'yellow' : 'white';
+      const tags = proj.tags.length > 0 ? ` [${proj.tags.join(', ')}]` : '';
+      lines.push(`      ${colorize(proj.type, typeColor)} ${proj.name} (${proj.root})${tags}`);
+    }
   }
 
   // Threshold warnings from .ngpulserc.json

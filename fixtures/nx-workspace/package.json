@@ -1,0 +1,17 @@
+{
+  "name": "myorg",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@angular/core": "^18.2.0",
+    "@angular/common": "^18.2.0",
+    "@angular/router": "^18.2.0",
+    "rxjs": "~7.8.1",
+    "zone.js": "~0.14.4"
+  },
+  "devDependencies": {
+    "typescript": "~5.5.0",
+    "nx": "^19.0.0",
+    "@angular/cli": "^18.2.0"
+  }
+}

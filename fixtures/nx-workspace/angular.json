@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "projects": {
+    "demo-app": {
+      "root": "apps/demo-app",
+      "sourceRoot": "apps/demo-app/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application"
+        }
+      }
+    },
+    "shared-lib": {
+      "root": "libs/shared-lib",
+      "sourceRoot": "libs/shared-lib/src",
+      "projectType": "library"
+    }
+  },
+  "defaultProject": "demo-app"
+}

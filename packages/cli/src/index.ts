@@ -25,7 +25,8 @@ function globalOpts(cmd: Command): Command {
     .option('-r, --root <path>', 'Angular project root', process.cwd())
     .option('--json', 'Output as JSON', false)
     .option('-v, --verbose', 'Verbose output', false)
-    .option('-m, --more', 'Show file details for each indicator', false);
+    .option('-m, --more', 'Show file details for each indicator', false)
+    .option('-p, --project <name>', 'NX project name to scope the analysis');
 }
 
 interface RawOptions {
@@ -33,11 +34,12 @@ interface RawOptions {
   json: boolean;
   verbose: boolean;
   more: boolean;
+  project?: string;
 }
 
 async function getOptions(opts: RawOptions): Promise<GlobalOptions> {
   const root = await findAngularRoot(opts.root);
-  return { root, json: opts.json || false, verbose: opts.verbose || false, more: opts.more || false };
+  return { root, json: opts.json || false, verbose: opts.verbose || false, more: opts.more || false, project: opts.project };
 }
 
 function wrapAction(fn: (opts: RawOptions) => Promise<void>): (opts: RawOptions) => Promise<void> {

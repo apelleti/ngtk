@@ -3,6 +3,7 @@ export interface GlobalOptions {
   json: boolean;
   verbose: boolean;
   more: boolean;
+  project?: string;
 }
 
 export interface ComponentMeta {

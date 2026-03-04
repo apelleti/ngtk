@@ -89,6 +89,9 @@ importers:
       '@ngpulse/orphans':
         specifier: workspace:*
         version: link:../orphans
+      '@ngpulse/report':
+        specifier: workspace:*
+        version: link:../report
       '@ngpulse/route-tree':
         specifier: workspace:*
         version: link:../route-tree
@@ -194,6 +197,33 @@ importers:
 
   packages/orphans:
     dependencies:
+      '@ngpulse/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/report:
+    dependencies:
+      '@ngpulse/circular-deps':
+        specifier: workspace:*
+        version: link:../circular-deps
+      '@ngpulse/compat-matrix':
+        specifier: workspace:*
+        version: link:../compat-matrix
+      '@ngpulse/dead-css':
+        specifier: workspace:*
+        version: link:../dead-css
+      '@ngpulse/debt-log':
+        specifier: workspace:*
+        version: link:../debt-log
+      '@ngpulse/hardcoded-secrets':
+        specifier: workspace:*
+        version: link:../hardcoded-secrets
+      '@ngpulse/info':
+        specifier: workspace:*
+        version: link:../info
+      '@ngpulse/orphans':
+        specifier: workspace:*
+        version: link:../orphans
       '@ngpulse/shared':
         specifier: workspace:*
         version: link:../shared
