@@ -19,6 +19,27 @@ npx @ngpulse/cli info
 
 ---
 
+![ngpulse info demo](demo/demo-info.gif)
+
+<details>
+<summary>More demos</summary>
+
+**Tech debt overview**
+![debt-log](demo/demo-debt-log.gif)
+
+**Route tree**
+![route-tree](demo/demo-route-tree.gif)
+
+**Security scan**
+![hardcoded-secrets](demo/demo-hardcoded-secrets.gif)
+
+**Migration hints**
+![migration-hints](demo/demo-migration-hints.gif)
+
+</details>
+
+---
+
 ```
 ╭─────────────────────────────────────────────────────────╮
 │                                                         │
