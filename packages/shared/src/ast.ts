@@ -1,4 +1,6 @@
-import { Project, SyntaxKind, type SourceFile, type ObjectLiteralExpression, type Expression } from 'ts-morph';
+import { Project, SyntaxKind, type SourceFile, type ObjectLiteralExpression, type Expression, type ClassDeclaration, type Decorator, type PropertyDeclaration, type ParameterDeclaration } from 'ts-morph';
+
+export type { Project, SourceFile, ClassDeclaration, Decorator, PropertyDeclaration, ParameterDeclaration };
 import type { ComponentMeta, ServiceMeta } from './types';
 import { scanFiles } from './fs';
 
@@ -99,6 +101,58 @@ function extractServiceMeta(sourceFile: SourceFile, filePath: string): ServiceMe
   }
   return null;
 }
+
+// --- Reusable AST helpers ---
+
+export function getClasses(sf: SourceFile): ClassDeclaration[] {
+  return sf.getClasses();
+}
+
+export function getDecorator(cls: ClassDeclaration, name: string): Decorator | undefined {
+  return cls.getDecorator(name);
+}
+
+export function getDecoratorProp(decorator: Decorator, prop: string): string | undefined {
+  const args = decorator.getArguments();
+  if (args.length === 0) return undefined;
+  const obj = args[0].asKind(SyntaxKind.ObjectLiteralExpression);
+  if (!obj) return undefined;
+  const init = getPropInitializer(obj, prop);
+  if (!init) return undefined;
+  return init.getText();
+}
+
+export function importsFrom(sf: SourceFile, module: string): boolean {
+  return sf.getImportDeclarations().some(
+    (imp) => imp.getModuleSpecifierValue() === module,
+  );
+}
+
+export function getPropsWithDecorator(cls: ClassDeclaration, decoratorName: string): PropertyDeclaration[] {
+  return cls.getProperties().filter((p) => p.getDecorator(decoratorName) !== undefined);
+}
+
+export function getConstructorParams(cls: ClassDeclaration): ParameterDeclaration[] {
+  const ctor = cls.getConstructors()[0];
+  if (!ctor) return [];
+  return ctor.getParameters();
+}
+
+export function addSourceFiles(project: Project, files: string[], verbose = false): SourceFile[] {
+  const sourceFiles: SourceFile[] = [];
+  for (const filePath of files) {
+    try {
+      sourceFiles.push(project.addSourceFileAtPath(filePath));
+    } catch (err) {
+      if (verbose) {
+        console.error(`Warning: could not parse ${filePath}: ${err instanceof Error ? err.message : err}`);
+      }
+    }
+  }
+  return sourceFiles;
+}
+
+// --- Internal helpers ---
 
 function getPropInitializer(obj: ObjectLiteralExpression, name: string): Expression | undefined {
   const prop = obj.getProperty(name)?.asKind(SyntaxKind.PropertyAssignment);
